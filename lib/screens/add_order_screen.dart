@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/order_model.dart';
+import 'package:leads_manager/models/order_model.dart';
 import '../models/customer_model.dart';
 import '../models/service_model.dart'; // Still named label_model but contains ServiceModel
 import '../services/database_service.dart';
@@ -23,7 +23,9 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   String? _selectedServiceName;
   late TextEditingController _costController;
   late TextEditingController _sellAmountController;
+  // Payment controller removed as per request
   String _selectedStatus = 'NEW';
+  String _selectedBank = '';
   bool _isLoading = false;
   late String _orderNumber;
 
@@ -39,6 +41,11 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
     _sellAmountController = TextEditingController(
       text: widget.orderToEdit?.sellAmount.toString() ?? '',
     );
+    _sellAmountController = TextEditingController(
+      text: widget.orderToEdit?.sellAmount.toString() ?? '',
+    );
+    // Payment controller init removed
+    _selectedBank = widget.orderToEdit?.bank ?? '';
     _selectedStatus = widget.orderToEdit?.status ?? 'NEW';
     _orderNumber = widget.orderToEdit?.orderNumber ?? _generateOrderNumber();
   }
@@ -51,6 +58,9 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   void dispose() {
     _costController.dispose();
     _sellAmountController.dispose();
+    _costController.dispose();
+    _sellAmountController.dispose();
+    // Payment controller dispose removed
     super.dispose();
   }
 
@@ -82,6 +92,8 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
       serviceName: _selectedServiceName!,
       cost: double.tryParse(_costController.text) ?? 0.0,
       sellAmount: double.tryParse(_sellAmountController.text) ?? 0.0,
+      payment: 0.0, // Default to 0 as input is removed
+      bank: _selectedBank,
       status: _selectedStatus,
       customerId: widget.customer.id,
       customerName: widget.customer.name,
@@ -216,6 +228,100 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                             ),
                             validator: (v) =>
                                 v == null || v.isEmpty ? "Required" : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Select Payment Method",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => _selectedBank = "HNB");
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _selectedBank == "HNB"
+                                    ? Colors.blue.withOpacity(0.1)
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: _selectedBank == "HNB"
+                                      ? Colors.blue
+                                      : Colors.grey.shade300,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.account_balance,
+                                    color: Colors.blue,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "HNB",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => _selectedBank = "BOC");
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _selectedBank == "BOC"
+                                    ? Colors.yellow.withOpacity(0.1)
+                                    : Colors.white,
+                                border: Border.all(
+                                  color: _selectedBank == "BOC"
+                                      ? const Color(0xFFFFD700) // Gold/Yellow
+                                      : Colors.grey.shade300,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.account_balance,
+                                    color: Colors.yellow[800],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    "BOC",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],

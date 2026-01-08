@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
-import '../models/order_model.dart';
+import 'package:leads_manager/models/order_model.dart';
 import '../models/customer_model.dart';
 import '../services/database_service.dart';
 import '../theme/app_theme.dart';
@@ -202,6 +202,46 @@ class OrderCard extends StatelessWidget {
                 "Cost: \$${order.cost.toStringAsFixed(2)}",
                 style: const TextStyle(fontSize: 14, color: Colors.blueGrey),
               ),
+              if (order.bank.isNotEmpty || order.payment > 0) ...[
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (order.payment > 0)
+                      Text(
+                        "Paid: \$${order.payment.toStringAsFixed(2)}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    if (order.bank.isNotEmpty)
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.account_balance,
+                            size: 16,
+                            color: order.bank == 'HNB'
+                                ? Colors.orange
+                                : (order.bank == 'BOC'
+                                      ? Colors.yellow[700]
+                                      : Colors.grey),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            order.bank,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
