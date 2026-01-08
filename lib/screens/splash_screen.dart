@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryGreen,
+      backgroundColor: AppTheme.primaryBlue,
       body: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -69,12 +69,12 @@ class _SplashScreenState extends State<SplashScreen>
                       child: const Icon(
                         Icons.business_center,
                         size: 60,
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                       ),
                     ),
                     const SizedBox(height: 24),
                     const Text(
-                      "LEADS",
+                      "BOOKING APP",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -95,11 +95,15 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: 32),
                     const Text(
                       "All Rights Reserved",
-                      style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Roboto'),
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontFamily: 'Roboto',
+                      ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      "Self Holidays",
+                      "Booking App",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,

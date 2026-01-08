@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:leads_manager/models/customer_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,13 +17,17 @@ class AddCustomerScreen extends StatefulWidget {
 
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _companyController;
+  late TextEditingController _agentNameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late TextEditingController _addressController;
   late TextEditingController _notesController;
   late TextEditingController _planController;
-  String _selectedLabelId = '';
+  late TextEditingController _passportNumberController;
+  DateTime? _selectedDob;
+  late TextEditingController _dobController;
+  String _selectedServiceId =
+      ''; // Changed _selectedLabelId to _selectedServiceId
   bool _isLoading = false;
 
   @override
@@ -31,26 +35,35 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     super.initState();
     final c = widget.customerToEdit;
     _nameController = TextEditingController(text: c?.name ?? "");
-    _companyController = TextEditingController(text: c?.company ?? "");
+    _agentNameController = TextEditingController(text: c?.agentName ?? "");
     _phoneController = TextEditingController(text: c?.phone ?? "");
     _emailController = TextEditingController(text: c?.email ?? "");
     _addressController = TextEditingController(text: c?.address ?? "");
     _notesController = TextEditingController(text: c?.notes ?? "");
     _planController = TextEditingController(text: c?.plan ?? "Standard");
-    _selectedLabelId = (c?.labelIds.isNotEmpty ?? false)
-        ? c!.labelIds.first
+    _passportNumberController = TextEditingController(
+      text: c?.passportNumber ?? "",
+    );
+    _selectedDob = c?.dob;
+    _dobController = TextEditingController(
+      text: c?.dob != null ? c!.dob!.toIso8601String().split('T')[0] : "",
+    );
+    _selectedServiceId = (c?.serviceIds.isNotEmpty ?? false)
+        ? c!.serviceIds.first
         : "";
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _companyController.dispose();
+    _agentNameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
     _notesController.dispose();
     _planController.dispose();
+    _passportNumberController.dispose();
+    _dobController.dispose();
     super.dispose();
   }
 
@@ -88,16 +101,18 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     final customer = Customer(
       id: widget.customerToEdit?.id ?? '',
       name: _nameController.text,
-      company: _companyController.text,
+      agentName: _agentNameController.text,
       phone: _phoneController.text,
       email: _emailController.text,
       address: _addressController.text,
       notes: _notesController.text,
       plan: _planController.text,
-      labelIds: _selectedLabelId.isNotEmpty ? [_selectedLabelId] : [],
+      serviceIds: _selectedServiceId.isNotEmpty ? [_selectedServiceId] : [],
       status: widget.customerToEdit?.status,
       createdAt: widget.customerToEdit?.createdAt ?? DateTime.now(),
       creatorEmail: widget.customerToEdit?.creatorEmail ?? userEmail,
+      passportNumber: _passportNumberController.text,
+      dob: _selectedDob,
     );
 
     try {
@@ -115,7 +130,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   : "Customer created",
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
         Navigator.pop(context);
@@ -133,7 +148,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: Text(isEditing ? "Edit Customer" : "Add New Customer"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -147,7 +162,41 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildField(Icons.person, "Customer Name", _nameController),
-                _buildField(Icons.business, "Company", _companyController),
+                _buildField(
+                  Icons.person_outline,
+                  "Agent Name",
+                  _agentNameController,
+                ),
+                _buildField(
+                  Icons.assignment_ind_outlined,
+                  "Passport Number",
+                  _passportNumberController,
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDob ?? DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        _selectedDob = date;
+                        _dobController.text = date.toIso8601String().split(
+                          'T',
+                        )[0];
+                      });
+                    }
+                  },
+                  child: AbsorbPointer(
+                    child: _buildField(
+                      Icons.calendar_today,
+                      "Date of Birth",
+                      _dobController,
+                    ),
+                  ),
+                ),
                 _buildField(Icons.phone, "Phone Number", _phoneController),
                 _buildField(
                   Icons.alternate_email,
@@ -160,7 +209,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   _addressController,
                 ),
                 _buildField(Icons.notes, "Additional Notes", _notesController),
-                _buildLabelDropdown(),
+                _buildServiceDropdown(),
               ],
             ),
           ),
@@ -229,7 +278,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF2E5A4B), size: 28),
+          Icon(icon, color: const Color(0xFF0046FF), size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(
@@ -246,32 +295,36 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     );
   }
 
-  Widget _buildLabelDropdown() {
+  Widget _buildServiceDropdown() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          const Icon(Icons.label_outline, color: Color(0xFF2E5A4B), size: 28),
+          const Icon(
+            Icons.miscellaneous_services_outlined,
+            color: Color(0xFF0046FF),
+            size: 28,
+          ),
           const SizedBox(width: 16),
           Expanded(
-            child: StreamBuilder<List<LabelModel>>(
-              stream: DatabaseService().getLabels(),
+            child: StreamBuilder<List<ServiceModel>>(
+              stream: DatabaseService().getServices(),
               builder: (context, snapshot) {
                 if (snapshot.hasError)
-                  return const Text("Error loading labels");
+                  return const Text("Error loading services");
                 if (!snapshot.hasData) return const SizedBox.shrink();
-                final labels = snapshot.data!;
-                if (labels.isEmpty)
-                  return const Text("No labels found. Create one first.");
+                final services = snapshot.data!;
+                if (services.isEmpty)
+                  return const Text("No services found. Create one first.");
                 return DropdownButtonFormField<String>(
-                  value: (labels.any((l) => l.id == _selectedLabelId))
-                      ? _selectedLabelId
+                  value: (services.any((l) => l.id == _selectedServiceId))
+                      ? _selectedServiceId
                       : null,
                   decoration: const InputDecoration(
-                    hintText: "Select Label",
+                    hintText: "Select Service",
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
                   ),
-                  items: labels.map((l) {
+                  items: services.map((l) {
                     return DropdownMenuItem(
                       value: l.id,
                       child: Row(
@@ -284,7 +337,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                     );
                   }).toList(),
                   onChanged: (val) {
-                    setState(() => _selectedLabelId = val ?? '');
+                    setState(() => _selectedServiceId = val ?? '');
                   },
                 );
               },

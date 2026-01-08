@@ -17,24 +17,24 @@ void main() async {
     debugPrint("Init error: $e");
   }
 
-  runApp(const LeadsManagerApp());
+  runApp(const BookingApp());
 }
 
-class LeadsManagerApp extends StatelessWidget {
-  const LeadsManagerApp({super.key});
+class BookingApp extends StatelessWidget {
+  const BookingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => AuthService())],
       child: MaterialApp(
-        title: 'Leads Manager',
+        title: 'Booking App',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.theme,
         home: const AuthWrapper(),
         routes: {
           '/customers': (context) => const MainScreen(initialIndex: 1),
-          '/labels': (context) => const MainScreen(initialIndex: 2),
+          '/services': (context) => const MainScreen(initialIndex: 2),
           '/reminders': (context) => const MainScreen(initialIndex: 3),
         },
       ),

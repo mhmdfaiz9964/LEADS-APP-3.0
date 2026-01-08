@@ -89,7 +89,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryGreen,
+              primary: AppTheme.primaryBlue,
             ),
           ),
           child: child!,
@@ -194,7 +194,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
                   : "Reminder set",
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
         Navigator.pop(context);
@@ -212,7 +212,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: Text(isEditing ? "Edit Task" : "Add New Task"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -291,7 +291,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF2E5A4B), size: 28),
+          Icon(icon, color: const Color(0xFF0046FF), size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(

@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class OrderModel {
   final String id;
   final String orderNumber;
-  final String productName;
-  final int quantity;
-  final double price;
+  final String serviceName;
+  final double cost;
+  final double sellAmount;
   final String status;
   final String customerId;
   final String customerName;
@@ -15,9 +15,9 @@ class OrderModel {
   OrderModel({
     required this.id,
     required this.orderNumber,
-    required this.productName,
-    required this.quantity,
-    required this.price,
+    required this.serviceName,
+    required this.cost,
+    required this.sellAmount,
     required this.status,
     required this.customerId,
     required this.customerName,
@@ -28,9 +28,9 @@ class OrderModel {
   Map<String, dynamic> toMap() {
     return {
       'orderNumber': orderNumber,
-      'productName': productName,
-      'quantity': quantity,
-      'price': price,
+      'serviceName': serviceName,
+      'cost': cost,
+      'sellAmount': sellAmount,
       'status': status,
       'customerId': customerId,
       'customerName': customerName,
@@ -44,10 +44,10 @@ class OrderModel {
     return OrderModel(
       id: doc.id,
       orderNumber: data['orderNumber'] ?? '',
-      productName: data['productName'] ?? '',
-      quantity: data['quantity'] ?? 0,
-      price: (data['price'] ?? 0.0).toDouble(),
-      status: data['status'] ?? 'ORDER',
+      serviceName: data['serviceName'] ?? data['productName'] ?? '',
+      cost: (data['cost'] ?? data['price'] ?? 0.0).toDouble(),
+      sellAmount: (data['sellAmount'] ?? 0.0).toDouble(),
+      status: data['status'] ?? 'NEW',
       customerId: data['customerId'] ?? '',
       customerName: data['customerName'] ?? '',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),

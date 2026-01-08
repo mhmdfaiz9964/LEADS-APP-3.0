@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/models/lead_model.dart';
 import 'package:leads_manager/models/customer_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/models/reminder_model.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:leads_manager/screens/lead_details_screen.dart';
 import 'package:leads_manager/screens/customer_details_screen.dart';
-import 'package:leads_manager/screens/label_details_screen.dart';
+import 'package:leads_manager/screens/service_details_screen.dart';
 import 'package:leads_manager/screens/add_lead_screen.dart';
 import 'package:leads_manager/screens/add_customer_screen.dart';
-import 'package:leads_manager/screens/add_reminder_screen.dart';
-import 'package:leads_manager/screens/add_label_screen.dart';
+import 'package:leads_manager/screens/add_service_screen.dart';
 import 'package:flutter/cupertino.dart';
 
 class UserActivitiesScreen extends StatefulWidget {
@@ -53,7 +53,7 @@ class _UserActivitiesScreenState extends State<UserActivitiesScreen>
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -73,7 +73,7 @@ class _UserActivitiesScreenState extends State<UserActivitiesScreen>
           tabs: const [
             Tab(text: "LEADS"),
             Tab(text: "CUSTOMERS"),
-            Tab(text: "LABELS"),
+            Tab(text: "SERVICES"),
             Tab(text: "REMINDERS"),
           ],
         ),
@@ -83,7 +83,7 @@ class _UserActivitiesScreenState extends State<UserActivitiesScreen>
         children: [
           _buildLeadsList(widget.filterEmail),
           _buildCustomersList(widget.filterEmail),
-          _buildLabelsList(widget.filterEmail),
+          _buildServicesList(widget.filterEmail),
           _buildRemindersList(widget.filterEmail),
         ],
       ),
@@ -143,20 +143,21 @@ class _UserActivitiesScreenState extends State<UserActivitiesScreen>
     );
   }
 
-  Widget _buildLabelsList(String? email) {
-    return StreamBuilder<List<LabelModel>>(
-      stream: DatabaseService().getLabels(filterEmail: email),
+  Widget _buildServicesList(String? email) {
+    return StreamBuilder<List<ServiceModel>>(
+      stream: DatabaseService().getServices(filterEmail: email),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return const Center(child: CircularProgressIndicator());
-        final labels = snapshot.data!;
-        if (labels.isEmpty) return const Center(child: Text("No labels found"));
+        final services = snapshot.data!;
+        if (services.isEmpty)
+          return const Center(child: Text("No services found"));
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          itemCount: labels.length,
+          itemCount: services.length,
           itemBuilder: (context, index) {
-            final label = labels[index];
-            return ActivityLabelCard(label: label, filterEmail: email);
+            final service = services[index];
+            return ActivityServiceCard(service: service, filterEmail: email);
           },
         );
       },
@@ -227,7 +228,7 @@ class _ActivityLeadCardState extends State<ActivityLeadCard> {
                 children: [
                   const Icon(
                     Icons.track_changes,
-                    color: Color(0xFF2E5A4B),
+                    color: Color(0xFF0046FF),
                     size: 36,
                   ),
                   const SizedBox(width: 12),
@@ -236,7 +237,7 @@ class _ActivityLeadCardState extends State<ActivityLeadCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${widget.lead.name} (${widget.lead.company})",
+                          "${widget.lead.name} (${widget.lead.agentName})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -245,7 +246,7 @@ class _ActivityLeadCardState extends State<ActivityLeadCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
-                        _buildLabelBadge(widget.lead.labelIds),
+                        _buildServiceBadge(widget.lead.serviceIds),
                       ],
                     ),
                   ),
@@ -346,27 +347,27 @@ class _ActivityLeadCardState extends State<ActivityLeadCard> {
     );
   }
 
-  Widget _buildLabelBadge(List<String> labelIds) {
+  Widget _buildServiceBadge(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
-        if (selectedLabels.isEmpty) return const SizedBox.shrink();
+        if (selectedServices.isEmpty) return const SizedBox.shrink();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
-                (label) => InkWell(
+                (service) => InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LabelDetailsScreen(label: label),
+                        builder: (_) => ServiceDetailsScreen(service: service),
                       ),
                     );
                   },
@@ -376,11 +377,11 @@ class _ActivityLeadCardState extends State<ActivityLeadCard> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: label.color,
+                      color: service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      label.name.toUpperCase(),
+                      service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,
@@ -457,14 +458,14 @@ class _ActivityCustomerCardState extends State<ActivityCustomerCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.person, color: Color(0xFF2E5A4B), size: 36),
+                  const Icon(Icons.person, color: Color(0xFF0046FF), size: 36),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${widget.customer.name} (${widget.customer.company})",
+                          "${widget.customer.name} (${widget.customer.agentName})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -473,7 +474,7 @@ class _ActivityCustomerCardState extends State<ActivityCustomerCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
-                        _buildLabelBadge(widget.customer.labelIds),
+                        _buildServiceBadge(widget.customer.serviceIds),
                       ],
                     ),
                   ),
@@ -577,27 +578,27 @@ class _ActivityCustomerCardState extends State<ActivityCustomerCard> {
     );
   }
 
-  Widget _buildLabelBadge(List<String> labelIds) {
+  Widget _buildServiceBadge(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
-        if (selectedLabels.isEmpty) return const SizedBox.shrink();
+        if (selectedServices.isEmpty) return const SizedBox.shrink();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
-                (label) => InkWell(
+                (service) => InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LabelDetailsScreen(label: label),
+                        builder: (_) => ServiceDetailsScreen(service: service),
                       ),
                     );
                   },
@@ -607,11 +608,11 @@ class _ActivityCustomerCardState extends State<ActivityCustomerCard> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: label.color,
+                      color: service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      label.name.toUpperCase(),
+                      service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,
@@ -648,16 +649,20 @@ class _ActivityCustomerCardState extends State<ActivityCustomerCard> {
   }
 }
 
-class ActivityLabelCard extends StatefulWidget {
-  final LabelModel label;
+class ActivityServiceCard extends StatefulWidget {
+  final ServiceModel service;
   final String? filterEmail;
-  const ActivityLabelCard({super.key, required this.label, this.filterEmail});
+  const ActivityServiceCard({
+    super.key,
+    required this.service,
+    this.filterEmail,
+  });
 
   @override
-  State<ActivityLabelCard> createState() => _ActivityLabelCardState();
+  State<ActivityServiceCard> createState() => _ActivityServiceCardState();
 }
 
-class _ActivityLabelCardState extends State<ActivityLabelCard> {
+class _ActivityServiceCardState extends State<ActivityServiceCard> {
   bool _isExpanded = false;
 
   @override
@@ -673,7 +678,7 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => LabelDetailsScreen(label: widget.label),
+            builder: (_) => ServiceDetailsScreen(service: widget.service),
           ),
         ),
         child: Padding(
@@ -689,11 +694,11 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: widget.label.color,
+                      color: widget.service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      widget.label.name.toUpperCase(),
+                      widget.service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -705,14 +710,14 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
                   const Spacer(),
                   FutureBuilder<int>(
                     future: DatabaseService()
-                        .getLeadsCountByLabel(
-                          widget.label.id,
+                        .getLeadsCountByService(
+                          widget.service.id,
                           filterEmail: widget.filterEmail,
                         )
                         .first,
                     builder: (context, snapshot) {
                       return Text(
-                        "${snapshot.data ?? 0} Customers",
+                        "${snapshot.data ?? 0} Records",
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[600],
@@ -741,7 +746,7 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  LabelDetailsScreen(label: widget.label),
+                                  ServiceDetailsScreen(service: widget.service),
                             ),
                           );
                         },
@@ -754,8 +759,9 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  AddLabelScreen(labelToEdit: widget.label),
+                              builder: (_) => AddServiceScreen(
+                                serviceToEdit: widget.service,
+                              ),
                             ),
                           );
                         },
@@ -765,7 +771,9 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
                         "Delete",
                         Colors.red,
                         () async {
-                          await DatabaseService().deleteLabel(widget.label.id);
+                          await DatabaseService().deleteService(
+                            widget.service.id,
+                          );
                         },
                       ),
                     ],
@@ -804,22 +812,12 @@ class _ActivityLabelCardState extends State<ActivityLabelCard> {
   }
 }
 
-class ActivityReminderCard extends StatefulWidget {
+class ActivityReminderCard extends StatelessWidget {
   final Reminder reminder;
   const ActivityReminderCard({super.key, required this.reminder});
 
   @override
-  State<ActivityReminderCard> createState() => _ActivityReminderCardState();
-}
-
-class _ActivityReminderCardState extends State<ActivityReminderCard> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('MMM dd, yyyy').format(widget.reminder.date);
-    final timeStr = DateFormat('hh:mm a').format(widget.reminder.date);
-
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
@@ -827,167 +825,59 @@ class _ActivityReminderCardState extends State<ActivityReminderCard> {
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(color: Colors.grey.withOpacity(0.1)),
       ),
-      child: InkWell(
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: widget.reminder.isCompleted
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.orange.withOpacity(0.1),
-                    child: Icon(
-                      widget.reminder.isCompleted
-                          ? Icons.check_circle
-                          : Icons.notifications,
-                      color: widget.reminder.isCompleted
-                          ? Colors.green
-                          : Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.reminder.title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            decoration: widget.reminder.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          dateStr,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        timeStr,
-                        style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          GestureDetector(
-                            onTap: () =>
-                                setState(() => _isExpanded = !_isExpanded),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.orange.withOpacity(0.5),
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.more_horiz,
-                                size: 16,
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Icon(
-                            widget.reminder.isPinned
-                                ? Icons.push_pin
-                                : Icons.push_pin_outlined,
-                            color: widget.reminder.isPinned
-                                ? AppTheme.secondaryOrange
-                                : Colors.grey[200],
-                            size: 18,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              AnimatedCrossFade(
-                firstChild: const SizedBox(width: double.infinity),
-                secondChild: Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: 52),
-                      _buildInlineAction(
-                        Icons.edit_outlined,
-                        "Edit",
-                        Colors.blue,
-                        () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AddReminderScreen(
-                                reminderToEdit: widget.reminder,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildInlineAction(
-                        Icons.delete_outline,
-                        "Delete",
-                        Colors.red,
-                        () async {
-                          await DatabaseService().deleteReminder(
-                            widget.reminder.id,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+      child: ListTile(
+        onTap: () async {
+          final doc = await FirebaseFirestore.instance
+              .collection(
+                reminder.targetType == 'LEAD'
+                    ? 'booking_leads'
+                    : 'booking_customers',
+              )
+              .doc(reminder.targetId)
+              .get();
+
+          if (doc.exists && context.mounted) {
+            if (reminder.targetType == 'LEAD') {
+              final lead = Lead.fromFirestore(doc);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => LeadDetailsScreen(lead: lead),
                 ),
-                crossFadeState: _isExpanded
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                duration: const Duration(milliseconds: 200),
-              ),
-            ],
+              );
+            } else {
+              final customer = Customer.fromFirestore(doc);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CustomerDetailsScreen(customer: customer),
+                ),
+              );
+            }
+          }
+        },
+        leading: Icon(
+          Icons.alarm,
+          color: reminder.isCompleted ? Colors.grey : Colors.purple,
+          size: 36,
+        ),
+        title: Text(
+          reminder.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            decoration: reminder.isCompleted
+                ? TextDecoration.lineThrough
+                : null,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInlineAction(
-    IconData icon,
-    String label,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 28),
-            Text(label, style: TextStyle(color: color, fontSize: 9)),
-          ],
+        subtitle: Text(
+          DateFormat('MMM d, h:mm a').format(reminder.date),
+          style: TextStyle(fontSize: 11, color: Colors.grey[400]),
         ),
+        trailing: reminder.isCompleted
+            ? const Icon(Icons.check_circle, color: Colors.green, size: 20)
+            : null,
       ),
     );
   }

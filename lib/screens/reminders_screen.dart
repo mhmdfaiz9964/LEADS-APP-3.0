@@ -51,7 +51,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Column(
@@ -281,7 +281,7 @@ class _ReminderCardState extends State<ReminderCard> {
                 children: [
                   Checkbox(
                     value: widget.reminder.isCompleted,
-                    activeColor: AppTheme.primaryGreen,
+                    activeColor: AppTheme.primaryBlue,
                     onChanged: (val) async {
                       if (val != null)
                         await DatabaseService().toggleReminderStatus(

@@ -1,61 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/lead_model.dart';
-import '../models/label_model.dart';
+import '../models/service_model.dart';
 import '../services/database_service.dart';
 import '../theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import 'add_label_screen.dart';
+import 'add_service_screen.dart';
 
-class SelectLeadLabelsScreen extends StatefulWidget {
+class SelectLeadServicesScreen extends StatefulWidget {
   final Lead lead;
-  const SelectLeadLabelsScreen({super.key, required this.lead});
+  const SelectLeadServicesScreen({super.key, required this.lead});
 
   @override
-  State<SelectLeadLabelsScreen> createState() => _SelectLeadLabelsScreenState();
+  State<SelectLeadServicesScreen> createState() =>
+      _SelectLeadServicesScreenState();
 }
 
-class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
-  final Set<String> _selectedLabelIds = {};
+class _SelectLeadServicesScreenState extends State<SelectLeadServicesScreen> {
+  final Set<String> _selectedServiceIds = {};
 
   @override
   void initState() {
     super.initState();
-    _selectedLabelIds.addAll(widget.lead.labelIds);
+    _selectedServiceIds.addAll(widget.lead.serviceIds);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Labels - ${widget.lead.name}"),
-        backgroundColor: AppTheme.appBarGreen,
+        title: Text("Services - ${widget.lead.name}"),
+        backgroundColor: AppTheme.appBarBlue,
       ),
       body: Builder(
         builder: (context) {
           final auth = Provider.of<AuthService>(context, listen: false);
-          final isAdmin = auth.currentUser?.role == 'admin';
+          final isAdmin = auth.currentUser?.role == 'Admin';
           return Column(
             children: [
               Expanded(
-                child: StreamBuilder<List<LabelModel>>(
-                  stream: DatabaseService().getLabels(),
+                child: StreamBuilder<List<ServiceModel>>(
+                  stream: DatabaseService().getServices(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData)
                       return const Center(child: CircularProgressIndicator());
-                    final labels = snapshot.data!;
+                    final services = snapshot.data!;
                     return ListView.builder(
-                      itemCount: labels.length + (isAdmin ? 1 : 0),
+                      itemCount: services.length + (isAdmin ? 1 : 0),
                       itemBuilder: (context, index) {
-                        if (isAdmin && index == labels.length) {
+                        if (isAdmin && index == services.length) {
                           return ListTile(
                             leading: const Icon(
                               Icons.add,
                               color: AppTheme.secondaryOrange,
                             ),
                             title: const Text(
-                              "NEW LABEL",
+                              "NEW SERVICE",
                               style: TextStyle(
                                 color: AppTheme.secondaryOrange,
                                 fontWeight: FontWeight.bold,
@@ -65,14 +66,16 @@ class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const AddLabelScreen(),
+                                  builder: (_) => const AddServiceScreen(),
                                 ),
                               );
                             },
                           );
                         }
-                        final label = labels[index];
-                        bool isSelected = _selectedLabelIds.contains(label.id);
+                        final service = services[index];
+                        bool isSelected = _selectedServiceIds.contains(
+                          service.id,
+                        );
                         return Column(
                           children: [
                             ListTile(
@@ -81,9 +84,9 @@ class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
                                 onChanged: (val) {
                                   setState(() {
                                     if (val == true) {
-                                      _selectedLabelIds.add(label.id);
+                                      _selectedServiceIds.add(service.id);
                                     } else {
-                                      _selectedLabelIds.remove(label.id);
+                                      _selectedServiceIds.remove(service.id);
                                     }
                                   });
                                 },
@@ -96,11 +99,11 @@ class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: label.color,
+                                    color: service.color,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    label.name.toUpperCase(),
+                                    service.name.toUpperCase(),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -114,9 +117,9 @@ class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
                               onTap: () {
                                 setState(() {
                                   if (isSelected) {
-                                    _selectedLabelIds.remove(label.id);
+                                    _selectedServiceIds.remove(service.id);
                                   } else {
-                                    _selectedLabelIds.add(label.id);
+                                    _selectedServiceIds.add(service.id);
                                   }
                                 });
                               },
@@ -135,9 +138,12 @@ class _SelectLeadLabelsScreenState extends State<SelectLeadLabelsScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     await FirebaseFirestore.instance
-                        .collection('leads')
+                        .collection('booking_leads')
                         .doc(widget.lead.id)
-                        .update({'labelIds': _selectedLabelIds.toList()});
+                        .update({
+                          'serviceIds': _selectedServiceIds.toList(),
+                          'labelIds': _selectedServiceIds.toList(),
+                        });
                     if (mounted) Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(

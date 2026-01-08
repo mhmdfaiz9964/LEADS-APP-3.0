@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/models/lead_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,41 +17,53 @@ class AddLeadScreen extends StatefulWidget {
 
 class _AddLeadScreenState extends State<AddLeadScreen> {
   late TextEditingController _nameController;
-  late TextEditingController _companyController;
+  late TextEditingController _agentNameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late TextEditingController _addressController;
   late TextEditingController _notesController;
+  late TextEditingController _passportNumberController;
+  DateTime? _selectedDob;
+  late TextEditingController _dobController;
 
   bool _isLoading = false;
-  String? _selectedLabelId;
+  String? _selectedServiceId;
 
   @override
   void initState() {
     super.initState();
     final lead = widget.leadToEdit;
     _nameController = TextEditingController(text: lead?.name ?? "");
-    _companyController = TextEditingController(text: lead?.company ?? "");
+    _agentNameController = TextEditingController(text: lead?.agentName ?? "");
     _phoneController = TextEditingController(text: lead?.phone ?? "");
     _emailController = TextEditingController(text: lead?.email ?? "");
     _addressController = TextEditingController(text: lead?.address ?? "");
     _notesController = TextEditingController(text: lead?.notes ?? "");
-    _selectedLabelId = (lead?.labelIds.isNotEmpty ?? false)
-        ? lead!.labelIds.first
+    _passportNumberController = TextEditingController(
+      text: lead?.passportNumber ?? "",
+    );
+    _selectedDob = lead?.dob;
+    _dobController = TextEditingController(
+      text: lead?.dob != null ? lead!.dob!.toIso8601String().split('T')[0] : "",
+    );
+    _selectedServiceId = (lead?.serviceIds.isNotEmpty ?? false)
+        ? lead!.serviceIds.first
         : null;
-    if (_selectedLabelId != null && _selectedLabelId!.isEmpty) {
-      _selectedLabelId = null;
+    if (_selectedServiceId != null && _selectedServiceId!.isEmpty) {
+      _selectedServiceId = null;
     }
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _companyController.dispose();
+    _agentNameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
     _notesController.dispose();
+    _passportNumberController.dispose();
+    _dobController.dispose();
     super.dispose();
   }
 
@@ -94,15 +106,17 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     final lead = Lead(
       id: widget.leadToEdit?.id ?? '',
       name: _nameController.text,
-      company: _companyController.text,
+      agentName: _agentNameController.text,
       phone: _phoneController.text,
       email: _emailController.text,
       address: _addressController.text,
       notes: _notesController.text,
       status: widget.leadToEdit?.status,
-      labelIds: _selectedLabelId != null ? [_selectedLabelId!] : [],
+      serviceIds: _selectedServiceId != null ? [_selectedServiceId!] : [],
       createdAt: widget.leadToEdit?.createdAt ?? DateTime.now(),
       creatorEmail: widget.leadToEdit?.creatorEmail ?? userEmail,
+      passportNumber: _passportNumberController.text,
+      dob: _selectedDob,
     );
 
     try {
@@ -117,7 +131,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             content: Text(
               widget.leadToEdit != null ? "Lead updated!" : "Lead saved!",
             ),
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -136,7 +150,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: Text(isEditing ? "Edit Lead" : "Add New Lead"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -150,7 +164,41 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildField(Icons.person, "Lead Name", _nameController),
-                _buildField(Icons.business, "Company", _companyController),
+                _buildField(
+                  Icons.person_outline,
+                  "Agent Name",
+                  _agentNameController,
+                ),
+                _buildField(
+                  Icons.assignment_ind_outlined,
+                  "Passport Number",
+                  _passportNumberController,
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDob ?? DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        _selectedDob = date;
+                        _dobController.text = date.toIso8601String().split(
+                          'T',
+                        )[0];
+                      });
+                    }
+                  },
+                  child: AbsorbPointer(
+                    child: _buildField(
+                      Icons.calendar_today,
+                      "Date of Birth",
+                      _dobController,
+                    ),
+                  ),
+                ),
                 _buildField(Icons.phone, "Phone Number", _phoneController),
                 _buildField(
                   Icons.alternate_email,
@@ -169,7 +217,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   "Classification",
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-                _buildLabelPicker(),
+                _buildServicePicker(),
               ],
             ),
           ),
@@ -242,7 +290,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
             ? CrossAxisAlignment.start
             : CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: const Color(0xFF2E5A4B), size: 28),
+          Icon(icon, color: const Color(0xFF0046FF), size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(
@@ -260,29 +308,29 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
     );
   }
 
-  Widget _buildLabelPicker() {
-    return StreamBuilder<List<LabelModel>>(
+  Widget _buildServicePicker() {
+    return StreamBuilder<List<ServiceModel>>(
       stream: DatabaseService()
-          .getLabels(), // Show all labels or filter as needed
+          .getServices(), // Show all labels or filter as needed
       builder: (context, snapshot) {
-        if (snapshot.hasError) return const Text("Error loading labels");
+        if (snapshot.hasError) return const Text("Error loading services");
         if (!snapshot.hasData) return const SizedBox();
-        final labels = snapshot.data!;
-        if (labels.isEmpty)
-          return const Text("No labels found. Create labels first.");
+        final services = snapshot.data!;
+        if (services.isEmpty)
+          return const Text("No services found. Create services first.");
         return Container(
           margin: const EdgeInsets.only(top: 8),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: (labels.any((l) => l.id == _selectedLabelId))
-                  ? _selectedLabelId
+              value: (services.any((l) => l.id == _selectedServiceId))
+                  ? _selectedServiceId
                   : null,
               isExpanded: true,
               hint: const Text(
-                "Select Label",
+                "Select Service",
                 style: TextStyle(color: Colors.grey, fontSize: 18),
               ),
-              items: labels.map((l) {
+              items: services.map((l) {
                 return DropdownMenuItem(
                   value: l.id,
                   child: Row(
@@ -294,7 +342,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   ),
                 );
               }).toList(),
-              onChanged: (val) => setState(() => _selectedLabelId = val),
+              onChanged: (val) => setState(() => _selectedServiceId = val),
             ),
           ),
         );

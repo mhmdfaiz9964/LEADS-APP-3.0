@@ -13,13 +13,13 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: const Text("Notifications"),
         actions: [
           TextButton(
@@ -63,7 +63,7 @@ class NotificationsScreen extends StatelessWidget {
         onTap: () => DatabaseService().markNotificationRead(n.id),
         leading: Icon(
           n.type == 'LEAD' ? Icons.track_changes : (n.type == 'CUSTOMER' ? Icons.person : Icons.notifications),
-          color: const Color(0xFF2E5A4B),
+          color: const Color(0xFF0046FF),
           size: 28,
         ),
         title: Text(n.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),

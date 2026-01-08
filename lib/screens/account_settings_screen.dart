@@ -66,7 +66,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           const SnackBar(
             content: Text('Test push sent! Check your device.'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       }
@@ -135,7 +135,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: const Text(
           'Account Settings',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -254,12 +254,12 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryGreen.withOpacity(0.1),
+                            color: AppTheme.primaryBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
                             Icons.notifications_active_outlined,
-                            color: AppTheme.primaryGreen,
+                            color: AppTheme.primaryBlue,
                             size: 24,
                           ),
                         ),

@@ -56,7 +56,9 @@ class AuthService with ChangeNotifier {
       );
       if (result.user != null) {
         // Auto-assign admin role if email starts with 'admin' (Demo logic)
-        String role = email.startsWith('admin') ? 'admin' : 'user';
+        String role = email.toLowerCase().startsWith('admin')
+            ? 'Admin'
+            : 'User';
         await _db.createUserProfile(result.user!.uid, email, role);
       }
       return null;

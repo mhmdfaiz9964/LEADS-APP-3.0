@@ -3,45 +3,54 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Lead {
   final String id;
   final String name;
-  final String company;
+  final String agentName; // Renamed from company
   final String phone;
   final String email;
   final String address;
   final String notes;
   final String? status; // 'NEW', 'PENDING', 'CLOSED'
-  final List<String> labelIds; // IDs of the assigned labels
+  final List<String> serviceIds; // IDs of the assigned services
   final bool isPinned;
   final DateTime createdAt;
   final String? creatorEmail;
+  final String? passportNumber;
+  final DateTime? dob;
 
   Lead({
     required this.id,
     required this.name,
-    required this.company,
+    required this.agentName,
     required this.phone,
     required this.email,
     required this.address,
     required this.notes,
     this.status,
-    this.labelIds = const [],
+    this.serviceIds = const [],
     this.isPinned = false,
     required this.createdAt,
     this.creatorEmail,
+    this.passportNumber,
+    this.dob,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'company': company,
+      'agentName': agentName,
+      'company': agentName, // Keep company for backward compatibility if needed
       'phone': phone,
       'email': email,
       'address': address,
       'notes': notes,
       'status': status,
-      'labelIds': labelIds,
+      'serviceIds': serviceIds,
+      'labelIds':
+          serviceIds, // Keep labelIds for backward compatibility in Firestore
       'isPinned': isPinned,
       'createdAt': Timestamp.fromDate(createdAt),
       'creatorEmail': creatorEmail,
+      'passportNumber': passportNumber,
+      'dob': dob != null ? Timestamp.fromDate(dob!) : null,
     };
   }
 
@@ -50,18 +59,22 @@ class Lead {
     return Lead(
       id: doc.id,
       name: data['name'] ?? '',
-      company: data['company'] ?? '',
+      agentName: data['agentName'] ?? data['company'] ?? '',
       phone: data['phone'] ?? '',
       email: data['email'] ?? '',
       address: data['address'] ?? '',
       notes: data['notes'] ?? '',
       status: data['status'],
-      labelIds: data['labelIds'] != null
-          ? List<String>.from(data['labelIds'])
-          : (data['labelId'] != null ? [data['labelId']] : []),
+      serviceIds: data['serviceIds'] != null
+          ? List<String>.from(data['serviceIds'])
+          : (data['labelIds'] != null
+                ? List<String>.from(data['labelIds'])
+                : (data['labelId'] != null ? [data['labelId']] : [])),
       isPinned: data['isPinned'] ?? false,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       creatorEmail: data['creatorEmail'],
+      passportNumber: data['passportNumber'],
+      dob: (data['dob'] as Timestamp?)?.toDate(),
     );
   }
 }

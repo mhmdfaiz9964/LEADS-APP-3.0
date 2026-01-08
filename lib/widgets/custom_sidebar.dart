@@ -15,7 +15,7 @@ class CustomSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final user = authService.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
 
     return Drawer(
       backgroundColor: Colors.white,
@@ -31,7 +31,7 @@ class CustomSidebar extends StatelessWidget {
             ),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.primaryGreen, Color(0xFF1B5E20)],
+                colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -56,7 +56,7 @@ class CustomSidebar extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: Icon(
                         Icons.person,
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                         size: 36,
                       ),
                     ),
@@ -68,7 +68,7 @@ class CustomSidebar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user?.email.split('@')[0].toUpperCase() ?? "USER",
+                        user?.email.split('@')[0].toUpperCase() ?? "User",
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -99,7 +99,7 @@ class CustomSidebar extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          (user?.role ?? 'user').toUpperCase(),
+                          (user?.role ?? 'User').toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -138,12 +138,17 @@ class CustomSidebar extends StatelessWidget {
                     }
                   },
                 ),
-                _buildSidebarItem(context, 'Labels', Icons.label_outline, () {
-                  if (onIndexChanged != null) {
-                    Navigator.pop(context);
-                    onIndexChanged!(2);
-                  }
-                }),
+                _buildSidebarItem(
+                  context,
+                  'Services',
+                  Icons.miscellaneous_services,
+                  () {
+                    if (onIndexChanged != null) {
+                      Navigator.pop(context);
+                      onIndexChanged!(2);
+                    }
+                  },
+                ),
                 _buildSidebarItem(
                   context,
                   'Reminders',
@@ -185,49 +190,49 @@ class CustomSidebar extends StatelessWidget {
                 ),
                 _buildStatusFilterItem(
                   context,
-                  'Orders',
+                  'New',
                   Icons.shopping_cart,
                   Colors.blue,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
-                      onIndexChanged!(4, statusFilter: "ORDER");
+                      onIndexChanged!(4, statusFilter: "NEW");
                     }
                   },
                 ),
                 _buildStatusFilterItem(
                   context,
-                  'Payment Approved',
+                  'Process',
                   Icons.check_circle,
                   Colors.green,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
-                      onIndexChanged!(4, statusFilter: "PAYMENT_APPROVED");
+                      onIndexChanged!(4, statusFilter: "PROCESS");
                     }
                   },
                 ),
                 _buildStatusFilterItem(
                   context,
-                  'Prepared',
+                  'Approved',
                   Icons.inventory,
                   Colors.orange,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
-                      onIndexChanged!(4, statusFilter: "PREPARED");
+                      onIndexChanged!(4, statusFilter: "APPROVED");
                     }
                   },
                 ),
                 _buildStatusFilterItem(
                   context,
-                  'Delivered',
+                  'Refused',
                   Icons.local_shipping,
                   Colors.purple,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
-                      onIndexChanged!(4, statusFilter: "DELIVERED");
+                      onIndexChanged!(4, statusFilter: "REFUSED");
                     }
                   },
                 ),
@@ -367,9 +372,7 @@ class CustomSidebar extends StatelessWidget {
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('Logout'),
-        content: const Text(
-          'Are you sure you want to log out of Leads Manager?',
-        ),
+        content: const Text('Are you sure you want to log out of Booking App?'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             isDefaultAction: true,

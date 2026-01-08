@@ -7,7 +7,7 @@ import '../models/lead_model.dart';
 import '../models/customer_model.dart';
 import '../models/order_model.dart';
 import '../models/reminder_model.dart';
-import '../models/label_model.dart';
+import '../models/service_model.dart';
 import 'lead_details_screen.dart';
 import 'customer_details_screen.dart';
 
@@ -57,7 +57,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: Text(
           fullName,
           style: const TextStyle(
@@ -78,7 +78,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
           tabs: [
             Tab(text: "Leads (${_stats?['leads'] ?? 0})"),
             Tab(text: "Customers (${_stats?['customers'] ?? 0})"),
-            Tab(text: "Orders (${_stats?['orders'] ?? 0})"),
+            Tab(text: "Services (${_stats?['orders'] ?? 0})"),
             Tab(text: "Reminders (${_stats?['reminders'] ?? 0})"),
           ],
         ),
@@ -128,11 +128,11 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                 ),
                 leading: const Icon(
                   Icons.track_changes,
-                  color: Color(0xFF2E5A4B),
+                  color: Color(0xFF0046FF),
                   size: 36,
                 ),
                 title: Text(
-                  "${lead.name} (${lead.company})",
+                  "${lead.name} (${lead.agentName})",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -142,7 +142,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4),
-                    _buildLabelBadge(lead.labelIds),
+                    _buildServiceBadge(lead.serviceIds),
                     const SizedBox(height: 4),
                     Text(
                       timeStr,
@@ -192,11 +192,11 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                 ),
                 leading: const Icon(
                   Icons.person,
-                  color: Color(0xFF2E5A4B),
+                  color: Color(0xFF0046FF),
                   size: 36,
                 ),
                 title: Text(
-                  "${customer.name} (${customer.company})",
+                  "${customer.name} (${customer.agentName})",
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -206,7 +206,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4),
-                    _buildLabelBadge(customer.labelIds),
+                    _buildServiceBadge(customer.serviceIds),
                     const SizedBox(height: 4),
                     Text(
                       timeStr,
@@ -238,10 +238,10 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
           itemBuilder: (context, index) {
             final order = orders[index];
             Color statusColor = Colors.blue;
-            if (order.status == 'COMPLETED') statusColor = Colors.green;
-            if (order.status == 'CANCELLED') statusColor = Colors.red;
-            if (order.status == 'PREPARED') statusColor = Colors.orange;
-            if (order.status == 'DELIVERED') statusColor = Colors.purple;
+            if (order.status == 'NEW') statusColor = Colors.blue;
+            if (order.status == 'PROCESS') statusColor = Colors.green;
+            if (order.status == 'APPROVED') statusColor = Colors.orange;
+            if (order.status == 'REFUSED') statusColor = Colors.purple;
 
             return Card(
               elevation: 0,
@@ -258,12 +258,12 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: AppTheme.appBarGreen.withOpacity(0.1),
+                        color: AppTheme.appBarBlue.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.shopping_bag,
-                        color: AppTheme.appBarGreen,
+                        color: AppTheme.appBarBlue,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -280,7 +280,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Order #${order.orderNumber} - ${order.productName}",
+                            "Service #${order.orderNumber} - ${order.serviceName}",
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 13,
@@ -288,7 +288,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "${DateFormat('MMM d').format(order.createdAt)} - ${order.price * order.quantity} AED",
+                            "${DateFormat('MMM d').format(order.createdAt)} - ${order.sellAmount} AED",
                             style: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 11,
@@ -344,7 +344,9 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
               onTap: () async {
                 final doc = await FirebaseFirestore.instance
                     .collection(
-                      reminder.targetType == 'LEAD' ? 'leads' : 'customers',
+                      reminder.targetType == 'LEAD'
+                          ? 'booking_leads'
+                          : 'booking_customers',
                     )
                     .doc(reminder.targetId)
                     .get();
@@ -400,32 +402,32 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
     );
   }
 
-  Widget _buildLabelBadge(List<String> labelIds) {
+  Widget _buildServiceBadge(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .take(2)
             .toList();
-        if (selectedLabels.isEmpty) return const SizedBox.shrink();
+        if (selectedServices.isEmpty) return const SizedBox.shrink();
         return Wrap(
           spacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
-                (label) => Container(
+                (service) => Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: label.color,
+                    color: service.color,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    label.name.toUpperCase(),
+                    service.name.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 8,

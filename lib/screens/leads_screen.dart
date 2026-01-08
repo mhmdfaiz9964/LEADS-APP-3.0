@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:leads_manager/models/lead_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/services/auth_service.dart';
 import 'package:leads_manager/screens/lead_details_screen.dart';
 import 'package:leads_manager/screens/add_lead_screen.dart';
-import 'package:leads_manager/screens/label_details_screen.dart';
+import 'package:leads_manager/screens/service_details_screen.dart';
 import 'package:provider/provider.dart';
 
 class LeadsScreen extends StatefulWidget {
@@ -20,6 +20,8 @@ class LeadsScreen extends StatefulWidget {
 }
 
 class _LeadsScreenState extends State<LeadsScreen> {
+  String _selectedFilter = "ALL";
+
   void _confirmMoveToCustomer(BuildContext context, Lead lead) {
     showDialog(
       context: context,
@@ -95,11 +97,39 @@ class _LeadsScreenState extends State<LeadsScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Column(
       children: [
+        // Service Filter Row
+        Container(
+          color: AppTheme.appBarBlue,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: StreamBuilder<List<ServiceModel>>(
+            stream: DatabaseService().getServices(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox();
+              final services = snapshot.data!;
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    _buildFilterChip("ALL", "ALL", AppTheme.secondaryOrange),
+                    ...services.map(
+                      (s) => _buildFilterChip(
+                        s.name.toUpperCase(),
+                        s.id,
+                        Color(s.colorValue),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -121,13 +151,21 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 return const Center(child: Text("No leads found"));
 
               var leads = snapshot.data!;
+
+              // Apply Service Filter
+              if (_selectedFilter != "ALL") {
+                leads = leads
+                    .where((l) => l.serviceIds.contains(_selectedFilter))
+                    .toList();
+              }
+
               if (widget.searchQuery.isNotEmpty) {
                 final query = widget.searchQuery.toLowerCase();
                 leads = leads
                     .where(
                       (l) =>
                           l.name.toLowerCase().contains(query) ||
-                          l.company.toLowerCase().contains(query),
+                          l.agentName.toLowerCase().contains(query),
                     )
                     .toList();
               }
@@ -167,6 +205,30 @@ class _LeadsScreenState extends State<LeadsScreen> {
       ],
     );
   }
+
+  Widget _buildFilterChip(String label, String id, Color color) {
+    bool isSelected = _selectedFilter == id;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedFilter = isSelected ? "ALL" : id),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(4),
+          border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class LeadCard extends StatefulWidget {
@@ -195,7 +257,7 @@ class _LeadCardState extends State<LeadCard> {
       context: context,
       builder: (context) => CupertinoActionSheet(
         title: Text(lead.name),
-        message: Text(lead.company),
+        message: Text(lead.agentName),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -272,7 +334,7 @@ class _LeadCardState extends State<LeadCard> {
                 children: [
                   const Icon(
                     Icons.track_changes,
-                    color: Color(0xFF2E5A4B),
+                    color: Color(0xFF0046FF),
                     size: 36,
                   ),
                   const SizedBox(width: 12),
@@ -281,7 +343,7 @@ class _LeadCardState extends State<LeadCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${widget.lead.name} (${widget.lead.company})",
+                          "${widget.lead.name} (${widget.lead.agentName})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -290,7 +352,7 @@ class _LeadCardState extends State<LeadCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
-                        _buildLabelBadge(widget.lead.labelIds),
+                        _buildServiceBadge(widget.lead.serviceIds),
                       ],
                     ),
                   ),
@@ -403,27 +465,27 @@ class _LeadCardState extends State<LeadCard> {
     );
   }
 
-  Widget _buildLabelBadge(List<String> labelIds) {
+  Widget _buildServiceBadge(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
-        if (selectedLabels.isEmpty) return const SizedBox.shrink();
+        if (selectedServices.isEmpty) return const SizedBox.shrink();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
-                (label) => InkWell(
+                (service) => InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LabelDetailsScreen(label: label),
+                        builder: (_) => ServiceDetailsScreen(service: service),
                       ),
                     );
                   },
@@ -433,11 +495,11 @@ class _LeadCardState extends State<LeadCard> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: label.color,
+                      color: service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      label.name.toUpperCase(),
+                      service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,

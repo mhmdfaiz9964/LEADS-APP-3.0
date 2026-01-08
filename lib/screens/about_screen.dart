@@ -31,9 +31,9 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: const Text(
-          'About Leads Manager',
+          'About Booking App',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -54,8 +54,8 @@ class AboutScreen extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppTheme.appBarGreen,
-                    AppTheme.appBarGreen.withOpacity(0.8),
+                    AppTheme.appBarBlue,
+                    AppTheme.appBarBlue.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -77,12 +77,12 @@ class AboutScreen extends StatelessWidget {
                     child: const Icon(
                       Icons.business_center,
                       size: 60,
-                      color: AppTheme.appBarGreen,
+                      color: AppTheme.appBarBlue,
                     ),
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'Leads Manager',
+                    'Booking App',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -158,12 +158,12 @@ class AboutScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: AppTheme.appBarGreen.withOpacity(0.1),
+                                color: AppTheme.appBarBlue.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: const Icon(
                                 Icons.code,
-                                color: AppTheme.appBarGreen,
+                                color: AppTheme.appBarBlue,
                                 size: 28,
                               ),
                             ),
@@ -177,7 +177,7 @@ class AboutScreen extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: AppTheme.appBarGreen,
+                                      color: AppTheme.appBarBlue,
                                     ),
                                   ),
                                   SizedBox(height: 4),
@@ -375,14 +375,14 @@ class AboutScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppTheme.appBarGreen.withOpacity(0.05),
+                      color: AppTheme.appBarBlue.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
                         const Icon(
                           Icons.copyright,
-                          color: AppTheme.appBarGreen,
+                          color: AppTheme.appBarBlue,
                           size: 24,
                         ),
                         const SizedBox(height: 8),
@@ -391,7 +391,7 @@ class AboutScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.appBarGreen,
+                            color: AppTheme.appBarBlue,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -400,7 +400,7 @@ class AboutScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.appBarGreen,
+                            color: AppTheme.appBarBlue,
                           ),
                         ),
                         const SizedBox(height: 8),

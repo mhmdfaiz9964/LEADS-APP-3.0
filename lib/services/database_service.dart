@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../models/lead_model.dart';
 import '../models/customer_model.dart';
-import '../models/label_model.dart';
+import '../models/service_model.dart';
 import '../models/reminder_model.dart';
 import '../models/notification_model.dart';
 import '../models/note_model.dart';
@@ -15,7 +15,7 @@ class DatabaseService {
   Future<String> getTargetName(String id, String type) async {
     try {
       final doc = await _db
-          .collection(type == 'LEAD' ? 'leads' : 'customers')
+          .collection(type == 'LEAD' ? 'booking_leads' : 'booking_customers')
           .doc(id)
           .get();
       if (doc.exists) {
@@ -29,7 +29,7 @@ class DatabaseService {
 
   // --- LEADS ---
   Stream<List<Lead>> getLeads({String? filterEmail}) {
-    Query query = _db.collection('leads');
+    Query query = _db.collection('booking_leads');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -41,7 +41,7 @@ class DatabaseService {
   }
 
   Future<void> addLead(Lead lead) async {
-    await _db.collection('leads').add(lead.toMap());
+    await _db.collection('booking_leads').add(lead.toMap());
     // await addNotification(
     //   AppNotification(
     //     id: '',
@@ -55,7 +55,7 @@ class DatabaseService {
   }
 
   Future<void> updateLead(Lead lead) async {
-    await _db.collection('leads').doc(lead.id).update(lead.toMap());
+    await _db.collection('booking_leads').doc(lead.id).update(lead.toMap());
     // await addNotification(
     //   AppNotification(
     //     id: '',
@@ -69,38 +69,41 @@ class DatabaseService {
   }
 
   Future<void> deleteLead(String id) {
-    return _db.collection('leads').doc(id).delete();
+    return _db.collection('booking_leads').doc(id).delete();
   }
 
   Future<void> toggleLeadPin(String id, bool currentStatus) {
-    return _db.collection('leads').doc(id).update({'isPinned': !currentStatus});
+    return _db.collection('booking_leads').doc(id).update({
+      'isPinned': !currentStatus,
+    });
   }
 
   Future<void> moveLeadToCustomer(Lead lead) async {
     final batch = _db.batch();
 
     // 1. Create customer document
-    final customerRef = _db.collection('customers').doc();
+    final customerRef = _db.collection('booking_customers').doc();
     batch.set(customerRef, {
       'name': lead.name,
-      'company': lead.company,
+      'agentName': lead.agentName,
+      'company': lead.agentName,
       'phone': lead.phone,
       'email': lead.email,
       'address': lead.address,
       'notes': lead.notes,
       'plan': 'Standard',
-      'labelIds': lead.labelIds,
+      'serviceIds': lead.serviceIds,
       'createdAt': Timestamp.now(),
       'creatorEmail': lead.creatorEmail,
     });
 
     // 2. Delete lead document
-    final leadRef = _db.collection('leads').doc(lead.id);
+    final leadRef = _db.collection('booking_leads').doc(lead.id);
     batch.delete(leadRef);
 
     // 3. Update associated reminders (if any)
     final reminders = await _db
-        .collection('reminders')
+        .collection('booking_reminders')
         .where('targetId', isEqualTo: lead.id)
         .where('targetType', isEqualTo: 'LEAD')
         .get();
@@ -114,7 +117,7 @@ class DatabaseService {
 
     // 4. Update associated notes (if any)
     final notes = await _db
-        .collection('notes')
+        .collection('booking_notes')
         .where('targetId', isEqualTo: lead.id)
         .where('targetType', isEqualTo: 'LEAD')
         .get();
@@ -129,20 +132,20 @@ class DatabaseService {
     return batch.commit();
   }
 
-  Stream<int> getLeadsCountByLabel(String labelId, {String? filterEmail}) {
-    Query query = _db.collection('leads');
+  Stream<int> getLeadsCountByService(String serviceId, {String? filterEmail}) {
+    Query query = _db.collection('booking_leads');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
     return query.snapshots().map((s) {
       final docs = s.docs.map((doc) => Lead.fromFirestore(doc)).toList();
-      return docs.where((l) => l.labelIds.contains(labelId)).length;
+      return docs.where((l) => l.serviceIds.contains(serviceId)).length;
     });
   }
 
   // --- CUSTOMERS ---
   Stream<List<Customer>> getCustomers({String? filterEmail}) {
-    Query query = _db.collection('customers');
+    Query query = _db.collection('booking_customers');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -156,7 +159,7 @@ class DatabaseService {
   }
 
   Future<void> addCustomer(Customer customer) async {
-    await _db.collection('customers').add(customer.toMap());
+    await _db.collection('booking_customers').add(customer.toMap());
     // await addNotification(
     //   AppNotification(
     //     id: '',
@@ -170,7 +173,10 @@ class DatabaseService {
   }
 
   Future<void> updateCustomer(Customer customer) async {
-    await _db.collection('customers').doc(customer.id).update(customer.toMap());
+    await _db
+        .collection('booking_customers')
+        .doc(customer.id)
+        .update(customer.toMap());
     // await addNotification(
     //   AppNotification(
     //     id: '',
@@ -184,19 +190,19 @@ class DatabaseService {
   }
 
   Future<void> deleteCustomer(String id) {
-    return _db.collection('customers').doc(id).delete();
+    return _db.collection('booking_customers').doc(id).delete();
   }
 
   Future<void> toggleCustomerPin(String id, bool currentStatus) {
-    return _db.collection('customers').doc(id).update({
+    return _db.collection('booking_customers').doc(id).update({
       'isPinned': !currentStatus,
     });
   }
 
-  Stream<List<Customer>> getCustomersByLabel(String labelId) {
+  Stream<List<Customer>> getCustomersByService(String serviceId) {
     return _db
-        .collection('customers')
-        .where('labelIds', arrayContains: labelId)
+        .collection('booking_customers')
+        .where('serviceIds', arrayContains: serviceId)
         .snapshots()
         .map(
           (snapshot) =>
@@ -204,44 +210,50 @@ class DatabaseService {
         );
   }
 
-  Stream<int> getCustomersCountByLabel(String labelId, {String? filterEmail}) {
-    Query query = _db.collection('customers');
+  Stream<int> getCustomersCountByService(
+    String serviceId, {
+    String? filterEmail,
+  }) {
+    Query query = _db.collection('booking_customers');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
     return query.snapshots().map((s) {
       final docs = s.docs.map((doc) => Customer.fromFirestore(doc)).toList();
-      return docs.where((l) => l.labelIds.contains(labelId)).length;
+      return docs.where((l) => l.serviceIds.contains(serviceId)).length;
     });
   }
 
-  // --- LABELS ---
-  Stream<List<LabelModel>> getLabels({String? filterEmail}) {
-    Query query = _db.collection('labels');
+  // --- SERVICES ---
+  Stream<List<ServiceModel>> getServices({String? filterEmail}) {
+    Query query = _db.collection('booking_services');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
     return query.snapshots().map(
       (snapshot) =>
-          snapshot.docs.map((doc) => LabelModel.fromFirestore(doc)).toList(),
+          snapshot.docs.map((doc) => ServiceModel.fromFirestore(doc)).toList(),
     );
   }
 
-  Future<void> addLabel(LabelModel label) {
-    return _db.collection('labels').add(label.toMap());
+  Future<void> addService(ServiceModel service) {
+    return _db.collection('booking_services').add(service.toMap());
   }
 
-  Future<void> updateLabel(LabelModel label) {
-    return _db.collection('labels').doc(label.id).update(label.toMap());
+  Future<void> updateService(ServiceModel service) {
+    return _db
+        .collection('booking_services')
+        .doc(service.id)
+        .update(service.toMap());
   }
 
-  Future<void> deleteLabel(String id) {
-    return _db.collection('labels').doc(id).delete();
+  Future<void> deleteService(String id) {
+    return _db.collection('booking_services').doc(id).delete();
   }
 
   // --- REMINDERS ---
   Stream<List<Reminder>> getReminders({String? filterEmail}) {
-    Query query = _db.collection('reminders');
+    Query query = _db.collection('booking_reminders');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -259,7 +271,7 @@ class DatabaseService {
     String targetType,
   ) {
     return _db
-        .collection('reminders')
+        .collection('booking_reminders')
         .where('targetId', isEqualTo: targetId)
         .where('targetType', isEqualTo: targetType)
         .snapshots()
@@ -273,7 +285,9 @@ class DatabaseService {
   }
 
   Future<DocumentReference> addReminder(Reminder reminder) async {
-    final docRef = await _db.collection('reminders').add(reminder.toMap());
+    final docRef = await _db
+        .collection('booking_reminders')
+        .add(reminder.toMap());
     await addNotification(
       AppNotification(
         id: '',
@@ -288,26 +302,29 @@ class DatabaseService {
   }
 
   Future<void> updateReminder(Reminder reminder) async {
-    await _db.collection('reminders').doc(reminder.id).update(reminder.toMap());
+    await _db
+        .collection('booking_reminders')
+        .doc(reminder.id)
+        .update(reminder.toMap());
   }
 
   Future<void> deleteReminder(String id) {
-    return _db.collection('reminders').doc(id).delete();
+    return _db.collection('booking_reminders').doc(id).delete();
   }
 
   Future<void> toggleReminderPin(String id, bool currentStatus) {
-    return _db.collection('reminders').doc(id).update({
+    return _db.collection('booking_reminders').doc(id).update({
       'isPinned': !currentStatus,
     });
   }
 
   Future<void> toggleReminderStatus(String id, bool currentStatus) async {
-    await _db.collection('reminders').doc(id).update({
+    await _db.collection('booking_reminders').doc(id).update({
       'isCompleted': !currentStatus,
     });
     if (!currentStatus) {
       // It was incomplete, now complete
-      final doc = await _db.collection('reminders').doc(id).get();
+      final doc = await _db.collection('booking_reminders').doc(id).get();
       final r = Reminder.fromFirestore(doc);
       await addNotification(
         AppNotification(
@@ -325,7 +342,7 @@ class DatabaseService {
   // --- NOTES ---
   Stream<List<Note>> getNotesByTarget(String targetId, String targetType) {
     return _db
-        .collection('notes')
+        .collection('booking_notes')
         .where('targetId', isEqualTo: targetId)
         .where('targetType', isEqualTo: targetType)
         .snapshots()
@@ -339,17 +356,17 @@ class DatabaseService {
   }
 
   Future<void> addNote(Note note) {
-    return _db.collection('notes').add(note.toMap());
+    return _db.collection('booking_notes').add(note.toMap());
   }
 
   Future<void> deleteNote(String id) {
-    return _db.collection('notes').doc(id).delete();
+    return _db.collection('booking_notes').doc(id).delete();
   }
 
   // --- NOTIFICATIONS ---
   Stream<List<AppNotification>> getNotifications({String? filterEmail}) {
     Query query = _db
-        .collection('notifications')
+        .collection('booking_notifications')
         .orderBy('timestamp', descending: true);
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
@@ -362,17 +379,17 @@ class DatabaseService {
   }
 
   Future<void> addNotification(AppNotification notification) {
-    return _db.collection('notifications').add(notification.toMap());
+    return _db.collection('booking_notifications').add(notification.toMap());
   }
 
   Future<void> broadcastNotification(String title, String message) async {
-    final usersSnapshot = await _db.collection('users').get();
+    final usersSnapshot = await _db.collection('booking_users').get();
     final batch = _db.batch();
     for (var userDoc in usersSnapshot.docs) {
       final userEmail = userDoc.data()['email'];
       if (userEmail == null) continue;
 
-      final notifRef = _db.collection('notifications').doc();
+      final notifRef = _db.collection('booking_notifications').doc();
       batch.set(notifRef, {
         'title': title,
         'message': message,
@@ -386,11 +403,13 @@ class DatabaseService {
   }
 
   Future<void> markNotificationRead(String id) {
-    return _db.collection('notifications').doc(id).update({'isRead': true});
+    return _db.collection('booking_notifications').doc(id).update({
+      'isRead': true,
+    });
   }
 
   Future<void> clearAllNotifications({String? filterEmail}) async {
-    Query query = _db.collection('notifications');
+    Query query = _db.collection('booking_notifications');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -416,19 +435,19 @@ class DatabaseService {
 
   Future<Map<String, int>> getUserStats(String email) async {
     final leads = await _db
-        .collection('leads')
+        .collection('booking_leads')
         .where('creatorEmail', isEqualTo: email)
         .get();
     final customers = await _db
-        .collection('customers')
+        .collection('booking_customers')
         .where('creatorEmail', isEqualTo: email)
         .get();
     final orders = await _db
-        .collection('orders')
+        .collection('booking_orders')
         .where('creatorEmail', isEqualTo: email)
         .get();
     final reminders = await _db
-        .collection('reminders')
+        .collection('booking_reminders')
         .where('creatorEmail', isEqualTo: email)
         .get();
 
@@ -441,7 +460,7 @@ class DatabaseService {
   }
 
   Future<void> deleteUser(String uid) {
-    return _db.collection('users').doc(uid).delete();
+    return _db.collection('booking_users').doc(uid).delete();
   }
 
   Future<void> updateUserProfile(
@@ -450,7 +469,7 @@ class DatabaseService {
     String role,
     String fullName,
   ) {
-    return _db.collection('users').doc(uid).update({
+    return _db.collection('booking_users').doc(uid).update({
       'email': email,
       'role': role,
       'fullName': fullName,
@@ -463,7 +482,7 @@ class DatabaseService {
     String role, {
     String? fullName,
   }) {
-    return _db.collection('users').doc(uid).set({
+    return _db.collection('booking_users').doc(uid).set({
       'email': email,
       'role': role,
       'fullName': fullName ?? '',
@@ -471,20 +490,23 @@ class DatabaseService {
   }
 
   Future<String> getUserRole(String uid) async {
-    final doc = await _db.collection('users').doc(uid).get();
+    final doc = await _db.collection('booking_users').doc(uid).get();
     if (doc.exists && doc.data() != null) {
-      return doc.data()!['role'] ?? 'user';
+      return doc.data()!['role'] ?? 'User';
     }
-    return 'user';
+    return 'User';
   }
 
   Future<void> updateUserToken(String uid, String token) {
-    return _db.collection('users').doc(uid).update({'fcmToken': token});
+    return _db.collection('booking_users').doc(uid).update({'fcmToken': token});
   }
 
   // --- BUSINESS PROFILE ---
   Future<BusinessProfile?> getBusinessProfile(String uid) async {
-    final doc = await _db.collection('business_profiles').doc(uid).get();
+    final doc = await _db
+        .collection('booking_business_profiles')
+        .doc(uid)
+        .get();
     if (doc.exists && doc.data() != null) {
       return BusinessProfile.fromMap(doc.data()!, uid);
     }
@@ -493,13 +515,13 @@ class DatabaseService {
 
   Future<void> saveBusinessProfile(BusinessProfile profile) {
     return _db
-        .collection('business_profiles')
+        .collection('booking_business_profiles')
         .doc(profile.id)
         .set(profile.toMap(), SetOptions(merge: true));
   }
 
   Future<Customer?> getCustomerById(String id) async {
-    final doc = await _db.collection('customers').doc(id).get();
+    final doc = await _db.collection('booking_customers').doc(id).get();
     if (doc.exists) {
       return Customer.fromFirestore(doc);
     }
@@ -508,7 +530,7 @@ class DatabaseService {
 
   // --- ORDERS ---
   Stream<List<OrderModel>> getOrders({String? filterEmail}) {
-    Query query = _db.collection('orders');
+    Query query = _db.collection('booking_orders');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -523,7 +545,7 @@ class DatabaseService {
 
   Stream<List<OrderModel>> getOrdersByCustomer(String customerId) {
     return _db
-        .collection('orders')
+        .collection('booking_orders')
         .where('customerId', isEqualTo: customerId)
         .snapshots()
         .map((snapshot) {
@@ -536,7 +558,7 @@ class DatabaseService {
   }
 
   Future<void> addOrder(OrderModel order) async {
-    await _db.collection('orders').add(order.toMap());
+    await _db.collection('booking_orders').add(order.toMap());
     // await addNotification(
     //   AppNotification(
     //     id: '',
@@ -550,10 +572,12 @@ class DatabaseService {
   }
 
   Future<void> updateOrderStatus(String orderId, String newStatus) {
-    return _db.collection('orders').doc(orderId).update({'status': newStatus});
+    return _db.collection('booking_orders').doc(orderId).update({
+      'status': newStatus,
+    });
   }
 
   Future<void> deleteOrder(String orderId) {
-    return _db.collection('orders').doc(orderId).delete();
+    return _db.collection('booking_orders').doc(orderId).delete();
   }
 }

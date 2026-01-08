@@ -62,7 +62,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundColor: AppTheme.appBarGreen,
+                        backgroundColor: AppTheme.appBarBlue,
                         backgroundImage: _profileImage != null
                             ? FileImage(_profileImage!)
                             : null,
@@ -98,7 +98,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    user?.email.split('@')[0].toUpperCase() ?? "USER",
+                    user?.email.split('@')[0].toUpperCase() ?? "User",
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -116,13 +116,13 @@ class _BusinessScreenState extends State<BusinessScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       "Role: ${user?.role ?? 'User'}",
                       style: const TextStyle(
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -173,7 +173,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
             _buildBusinessItem(
               context,
               Icons.info_outline,
-              "About Leads Manager",
+              "About Booking App",
               "Version 2.1.0 - Developer Info",
               () {
                 Navigator.push(
@@ -216,7 +216,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
     VoidCallback? onTap,
   ) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF2E5A4B), size: 28),
+      leading: Icon(icon, color: const Color(0xFF0046FF), size: 28),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(
         subtitle,

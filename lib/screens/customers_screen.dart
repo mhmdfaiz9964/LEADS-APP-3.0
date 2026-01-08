@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:leads_manager/models/customer_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/services/auth_service.dart';
 import 'package:leads_manager/screens/customer_details_screen.dart';
 import 'package:leads_manager/screens/add_customer_screen.dart';
-import 'package:leads_manager/screens/label_details_screen.dart';
+import 'package:leads_manager/screens/service_details_screen.dart';
 import 'package:provider/provider.dart';
 
 class CustomersScreen extends StatefulWidget {
@@ -33,28 +33,28 @@ class _CustomersScreenState extends State<CustomersScreen> {
             _buildStatusOption(
               ctx,
               customer,
-              "ORDER",
+              "NEW",
               Icons.shopping_cart,
               Colors.blue,
             ),
             _buildStatusOption(
               ctx,
               customer,
-              "PAYMENT_APPROVED",
+              "PROCESS",
               Icons.check_circle,
               Colors.green,
             ),
             _buildStatusOption(
               ctx,
               customer,
-              "PREPARED",
+              "APPROVED",
               Icons.inventory,
               Colors.orange,
             ),
             _buildStatusOption(
               ctx,
               customer,
-              "DELIVERED",
+              "REFUSED",
               Icons.local_shipping,
               Colors.purple,
             ),
@@ -145,7 +145,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Column(
@@ -159,26 +159,26 @@ class _CustomersScreenState extends State<CustomersScreen> {
             style: TextStyle(color: Colors.grey[600], fontSize: 13),
           ),
         ),
-        // Label Filter Row
+        // Service Filter Row
         Container(
-          color: AppTheme.appBarGreen,
+          color: AppTheme.appBarBlue,
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: StreamBuilder<List<LabelModel>>(
-            stream: DatabaseService().getLabels(),
-            builder: (context, labelSnapshot) {
-              if (!labelSnapshot.hasData) return const SizedBox();
-              final labels = labelSnapshot.data!;
+          child: StreamBuilder<List<ServiceModel>>(
+            stream: DatabaseService().getServices(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox();
+              final services = snapshot.data!;
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   children: [
                     _buildFilterChip("ALL", "ALL", AppTheme.secondaryOrange),
-                    ...labels.map(
-                      (l) => _buildFilterChip(
-                        l.name.toUpperCase(),
-                        l.id,
-                        Color(l.colorValue),
+                    ...services.map(
+                      (s) => _buildFilterChip(
+                        s.name.toUpperCase(),
+                        s.id,
+                        Color(s.colorValue),
                       ),
                     ),
                   ],
@@ -200,10 +200,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
 
               var customers = snapshot.data!;
 
-              // Apply label filter
+              // Apply service filter
               if (_selectedFilter != "ALL") {
                 customers = customers
-                    .where((c) => c.labelIds.contains(_selectedFilter))
+                    .where((c) => c.serviceIds.contains(_selectedFilter))
                     .toList();
               }
 
@@ -294,7 +294,7 @@ class _CustomerCardState extends State<CustomerCard> {
       context: context,
       builder: (context) => CupertinoActionSheet(
         title: Text(customer.name),
-        message: Text(customer.company),
+        message: Text(customer.agentName),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -376,14 +376,14 @@ class _CustomerCardState extends State<CustomerCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.person, color: Color(0xFF2E5A4B), size: 36),
+                  const Icon(Icons.person, color: Color(0xFF0046FF), size: 36),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${widget.customer.name} (${widget.customer.company})",
+                          "${widget.customer.name} (${widget.customer.agentName})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -392,7 +392,7 @@ class _CustomerCardState extends State<CustomerCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
-                        _buildLabelBadge(widget.customer.labelIds),
+                        _buildServiceBadge(widget.customer.serviceIds),
                       ],
                     ),
                   ),
@@ -515,27 +515,27 @@ class _CustomerCardState extends State<CustomerCard> {
     );
   }
 
-  Widget _buildLabelBadge(List<String> labelIds) {
+  Widget _buildServiceBadge(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
-        if (selectedLabels.isEmpty) return const SizedBox.shrink();
+        if (selectedServices.isEmpty) return const SizedBox.shrink();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
-                (label) => InkWell(
+                (service) => InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LabelDetailsScreen(label: label),
+                        builder: (_) => ServiceDetailsScreen(service: service),
                       ),
                     );
                   },
@@ -545,11 +545,11 @@ class _CustomerCardState extends State<CustomerCard> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: label.color,
+                      color: service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      label.name.toUpperCase(),
+                      service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class LabelModel {
+class ServiceModel {
   final String id;
   final String name;
   final int colorValue;
   final String? creatorEmail;
 
-  LabelModel({
+  ServiceModel({
     required this.id,
     required this.name,
     required this.colorValue,
@@ -24,9 +24,9 @@ class LabelModel {
     };
   }
 
-  factory LabelModel.fromFirestore(DocumentSnapshot doc) {
+  factory ServiceModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return LabelModel(
+    return ServiceModel(
       id: doc.id,
       name: data['name'] ?? '',
       colorValue: data['colorValue'] ?? 0xFF000000,

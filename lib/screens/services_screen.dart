@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart'; // Still using label_model.dart but it has ServiceModel
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:leads_manager/screens/add_label_screen.dart';
-import 'package:leads_manager/screens/label_details_screen.dart';
+import 'package:leads_manager/screens/add_service_screen.dart';
+import 'package:leads_manager/screens/service_details_screen.dart';
 
-class LabelsScreen extends StatefulWidget {
+class ServicesScreen extends StatefulWidget {
   final String searchQuery;
-  const LabelsScreen({this.searchQuery = "", super.key});
+  const ServicesScreen({this.searchQuery = "", super.key});
 
   @override
-  State<LabelsScreen> createState() => _LabelsScreenState();
+  State<ServicesScreen> createState() => _ServicesScreenState();
 }
 
-class _LabelsScreenState extends State<LabelsScreen> {
-  void _confirmDelete(BuildContext context, LabelModel label) {
+class _ServicesScreenState extends State<ServicesScreen> {
+  void _confirmDelete(BuildContext context, ServiceModel service) {
     showCupertinoDialog(
       context: context,
       builder: (ctx) => CupertinoAlertDialog(
-        title: const Text("Delete Label"),
+        title: const Text("Delete Service"),
         content: const Text(
-          "Are you sure? This will not delete leads with this label, but they will lose the label reference.",
+          "Are you sure? This will not delete leads with this service, but they will lose the service reference.",
         ),
         actions: [
           CupertinoDialogAction(
@@ -32,7 +32,7 @@ class _LabelsScreenState extends State<LabelsScreen> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              await DatabaseService().deleteLabel(label.id);
+              await DatabaseService().deleteService(service.id);
               if (ctx.mounted) Navigator.pop(ctx);
             },
             child: const Text("Delete"),
@@ -46,7 +46,7 @@ class _LabelsScreenState extends State<LabelsScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Column(
@@ -61,47 +61,47 @@ class _LabelsScreenState extends State<LabelsScreen> {
           ),
         ),
         Expanded(
-          child: StreamBuilder<List<LabelModel>>(
-            stream: DatabaseService().getLabels(),
+          child: StreamBuilder<List<ServiceModel>>(
+            stream: DatabaseService().getServices(), // Now returns ServiceModel
             builder: (context, snapshot) {
               if (snapshot.hasError)
                 return Center(child: Text("Error: ${snapshot.error}"));
               if (snapshot.connectionState == ConnectionState.waiting)
                 return const Center(child: CircularProgressIndicator());
               if (!snapshot.hasData || snapshot.data!.isEmpty)
-                return const Center(child: Text("No labels found"));
+                return const Center(child: Text("No services found"));
 
-              var labels = snapshot.data!;
+              var services = snapshot.data!;
               if (widget.searchQuery.isNotEmpty) {
                 final query = widget.searchQuery.toLowerCase();
-                labels = labels
+                services = services
                     .where((l) => l.name.toLowerCase().contains(query))
                     .toList();
               }
 
               return ListView.builder(
                 padding: const EdgeInsets.fromLTRB(8, 4, 8, 100),
-                itemCount: labels.length,
+                itemCount: services.length,
                 itemBuilder: (context, index) {
-                  final label = labels[index];
+                  final service = services[index];
                   return StreamBuilder<int>(
-                    stream: DatabaseService().getLeadsCountByLabel(
-                      label.id,
+                    stream: DatabaseService().getLeadsCountByService(
+                      service.id,
                       filterEmail: filterEmail,
                     ),
                     builder: (context, leadsSnapshot) {
                       final leadsCount = leadsSnapshot.data ?? 0;
                       return StreamBuilder<int>(
-                        stream: DatabaseService().getCustomersCountByLabel(
-                          label.id,
+                        stream: DatabaseService().getCustomersCountByService(
+                          service.id,
                           filterEmail: filterEmail,
                         ),
                         builder: (context, customersSnapshot) {
                           final customersCount = customersSnapshot.data ?? 0;
-                          return LabelCard(
-                            label: label,
+                          return ServiceCard(
+                            service: service,
                             count: leadsCount + customersCount,
-                            onDelete: () => _confirmDelete(context, label),
+                            onDelete: () => _confirmDelete(context, service),
                             isAdmin: isAdmin,
                           );
                         },
@@ -118,32 +118,32 @@ class _LabelsScreenState extends State<LabelsScreen> {
   }
 }
 
-class LabelCard extends StatefulWidget {
-  final LabelModel label;
+class ServiceCard extends StatefulWidget {
+  final ServiceModel service;
   final int count;
   final VoidCallback onDelete;
   final bool isAdmin;
-  const LabelCard({
+  const ServiceCard({
     super.key,
-    required this.label,
+    required this.service,
     required this.count,
     required this.onDelete,
     required this.isAdmin,
   });
 
   @override
-  State<LabelCard> createState() => _LabelCardState();
+  State<ServiceCard> createState() => _ServiceCardState();
 }
 
-class _LabelCardState extends State<LabelCard> {
+class _ServiceCardState extends State<ServiceCard> {
   bool _isExpanded = false;
 
-  void _showLabelOptions(BuildContext context, LabelModel label) {
+  void _showServiceOptions(BuildContext context, ServiceModel service) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: Text('Label: ${label.name}'),
-        message: const Text('Choose an action for this label'),
+        title: Text('Service: ${service.name}'),
+        message: const Text('Choose an action for this service'),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -151,7 +151,7 @@ class _LabelCardState extends State<LabelCard> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LabelDetailsScreen(label: label),
+                  builder: (_) => ServiceDetailsScreen(service: service),
                 ),
               );
             },
@@ -164,11 +164,11 @@ class _LabelCardState extends State<LabelCard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AddLabelScreen(labelToEdit: label),
+                    builder: (_) => AddServiceScreen(serviceToEdit: service),
                   ),
                 );
               },
-              child: const Text('Edit Label'),
+              child: const Text('Edit Service'),
             ),
           if (widget.isAdmin)
             CupertinoActionSheetAction(
@@ -177,7 +177,7 @@ class _LabelCardState extends State<LabelCard> {
                 Navigator.pop(context);
                 widget.onDelete();
               },
-              child: const Text('Delete Label'),
+              child: const Text('Delete Service'),
             ),
         ],
         cancelButton: CupertinoActionSheetAction(
@@ -202,11 +202,11 @@ class _LabelCardState extends State<LabelCard> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => LabelDetailsScreen(label: widget.label),
+              builder: (_) => ServiceDetailsScreen(service: widget.service),
             ),
           );
         },
-        onLongPress: () => _showLabelOptions(context, widget.label),
+        onLongPress: () => _showServiceOptions(context, widget.service),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
           child: Column(
@@ -220,11 +220,11 @@ class _LabelCardState extends State<LabelCard> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: widget.label.color,
+                      color: widget.service.color,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      widget.label.name.toUpperCase(),
+                      widget.service.name.toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -235,7 +235,7 @@ class _LabelCardState extends State<LabelCard> {
                   ),
                   const Spacer(),
                   Text(
-                    "${widget.count} Customers",
+                    "${widget.count} Records",
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey[600],
@@ -261,7 +261,7 @@ class _LabelCardState extends State<LabelCard> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  LabelDetailsScreen(label: widget.label),
+                                  ServiceDetailsScreen(service: widget.service),
                             ),
                           );
                         },
@@ -275,8 +275,9 @@ class _LabelCardState extends State<LabelCard> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    AddLabelScreen(labelToEdit: widget.label),
+                                builder: (_) => AddServiceScreen(
+                                  serviceToEdit: widget.service,
+                                ),
                               ),
                             );
                           },

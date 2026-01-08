@@ -48,28 +48,28 @@ class _CartScreenState extends State<CartScreen> {
             _buildStatusOption(
               ctx,
               order,
-              "ORDER",
+              "NEW",
               Icons.shopping_cart,
               Colors.blue,
             ),
             _buildStatusOption(
               ctx,
               order,
-              "PAYMENT",
+              "PROCESS",
               Icons.check_circle,
               Colors.green,
             ),
             _buildStatusOption(
               ctx,
               order,
-              "PREPARED",
+              "APPROVED",
               Icons.inventory,
               Colors.orange,
             ),
             _buildStatusOption(
               ctx,
               order,
-              "DELIVERED",
+              "REFUSED",
               Icons.local_shipping,
               Colors.purple,
             ),
@@ -135,7 +135,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return Column(
@@ -161,29 +161,29 @@ class _CartScreenState extends State<CartScreen> {
                   "ALL",
                   "ALL",
                   Icons.apps,
-                  AppTheme.appBarGreen,
+                  AppTheme.appBarBlue,
                 ),
                 _buildStatusFilterChip(
-                  "ORDER",
-                  "ORDER",
+                  "NEW",
+                  "NEW",
                   Icons.shopping_cart,
                   Colors.blue,
                 ),
                 _buildStatusFilterChip(
-                  "PAYMENT",
-                  "PAYMENT",
+                  "PROCESS",
+                  "PROCESS",
                   Icons.check_circle,
                   Colors.green,
                 ),
                 _buildStatusFilterChip(
-                  "PREPARED",
-                  "PREPARED",
+                  "APPROVED",
+                  "APPROVED",
                   Icons.inventory,
                   Colors.orange,
                 ),
                 _buildStatusFilterChip(
-                  "DELIVERED",
-                  "DELIVERED",
+                  "REFUSED",
+                  "REFUSED",
                   Icons.local_shipping,
                   Colors.purple,
                 ),
@@ -275,10 +275,10 @@ class _OrderListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor = Colors.grey;
-    if (order.status == 'ORDER') statusColor = Colors.blue;
-    if (order.status == 'PAYMENT') statusColor = Colors.green;
-    if (order.status == 'PREPARED') statusColor = Colors.orange;
-    if (order.status == 'DELIVERED') statusColor = Colors.purple;
+    if (order.status == 'NEW') statusColor = Colors.blue;
+    if (order.status == 'PROCESS') statusColor = Colors.green;
+    if (order.status == 'APPROVED') statusColor = Colors.orange;
+    if (order.status == 'REFUSED') statusColor = Colors.purple;
 
     return Card(
       elevation: 0,
@@ -310,12 +310,12 @@ class _OrderListTile extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: AppTheme.appBarGreen.withOpacity(0.1),
+                  color: AppTheme.appBarBlue.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.shopping_bag,
-                  color: AppTheme.appBarGreen,
+                  color: AppTheme.appBarBlue,
                 ),
               ),
               const SizedBox(width: 12),
@@ -332,7 +332,7 @@ class _OrderListTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "Order #${order.orderNumber} - ${order.productName}",
+                      "Service #${order.orderNumber} - ${order.serviceName}",
                       style: TextStyle(color: Colors.grey[600], fontSize: 13),
                     ),
                     const SizedBox(height: 4),

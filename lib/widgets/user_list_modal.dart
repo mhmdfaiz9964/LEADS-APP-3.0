@@ -69,7 +69,7 @@ class UserListModal extends StatelessWidget {
                       final user = users[index];
                       final fullName = user['fullName'] ?? 'No Name';
                       final email = user['email'] ?? 'No Email';
-                      final role = user['role'] ?? 'user';
+                      final role = user['role'] ?? 'User';
 
                       return InkWell(
                         onTap: () {
@@ -101,14 +101,14 @@ class UserListModal extends StatelessWidget {
                           child: Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: AppTheme.primaryGreen
+                                backgroundColor: AppTheme.primaryBlue
                                     .withOpacity(0.1),
                                 child: Text(
                                   fullName.isNotEmpty
                                       ? fullName[0].toUpperCase()
                                       : 'U',
                                   style: const TextStyle(
-                                    color: AppTheme.primaryGreen,
+                                    color: AppTheme.primaryBlue,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -141,7 +141,7 @@ class UserListModal extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: role == 'admin'
+                                  color: role == 'Admin'
                                       ? Colors.red.withOpacity(0.1)
                                       : Colors.blue.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(4),
@@ -151,7 +151,7 @@ class UserListModal extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
-                                    color: role == 'admin'
+                                    color: role == 'Admin'
                                         ? Colors.red
                                         : Colors.blue,
                                   ),

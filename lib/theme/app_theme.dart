@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryGreen = Color(
-    0xFF1B5E20,
-  ); // Dark Green from screenshot
-  static const Color appBarGreen = Color(0xFF2E5A4B); // AppBar Green
-  static const Color secondaryOrange = Color(0xFFE67E22); // Orange from FAB
-  static const Color saleRed = Color(0xFFD32F2F); // Red for SALE badge
-  static const Color backgroundGrey = Color(0xFFF0F2F5);
+  static const Color primaryBlue = Color(0xFF0046FF);
+  static const Color appBarBlue = Color(0xFF0046FF);
+  static const Color lightBlue = Color(0xFF73C8D2);
+  static const Color secondaryOrange = Color(0xFFFF9013);
+  static const Color backgroundBeige = Colors.white;
   static const Color textGrey = Color(0xFF666666);
   static const Color iconGrey = Color(0xFF9E9E9E);
   static const Color iconBgOrange = Color(0xFFA57C36);
@@ -22,15 +20,15 @@ class AppTheme {
 
   static ThemeData get theme {
     return ThemeData(
-      primaryColor: primaryGreen,
-      scaffoldBackgroundColor: backgroundGrey,
+      primaryColor: primaryBlue,
+      scaffoldBackgroundColor: Colors.white,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryGreen,
+        seedColor: primaryBlue,
         secondary: secondaryOrange,
         surface: Colors.white,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: appBarGreen,
+        backgroundColor: appBarBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
@@ -48,7 +46,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryGreen,
+          backgroundColor: primaryBlue,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -64,7 +62,7 @@ class AppTheme {
           borderSide: BorderSide(color: Color(0xFFE0E0E0)),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: primaryGreen, width: 2),
+          borderSide: BorderSide(color: primaryBlue, width: 2),
         ),
         labelStyle: TextStyle(
           color: textGrey,

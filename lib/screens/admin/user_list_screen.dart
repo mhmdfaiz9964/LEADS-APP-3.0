@@ -20,7 +20,7 @@ class _UserListScreenState extends State<UserListScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text("Manage Users"),
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         elevation: 0,
         actions: [
           IconButton(
@@ -74,7 +74,7 @@ class _UserCardState extends State<UserCard> {
   Widget build(BuildContext context) {
     final email = widget.user['email'] ?? 'No email';
     final fullName = widget.user['fullName'] ?? 'No name';
-    final role = (widget.user['role'] ?? 'user').toString().toUpperCase();
+    final role = (widget.user['role'] ?? 'User').toString().toUpperCase();
     final uid = widget.user['uid'];
 
     return Card(
@@ -106,11 +106,11 @@ class _UserCardState extends State<UserCard> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
+                    backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                     child: Text(
                       fullName.isNotEmpty ? fullName[0].toUpperCase() : "?",
                       style: const TextStyle(
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -177,7 +177,7 @@ class _UserCardState extends State<UserCard> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: role == 'ADMIN'
+                          color: role == 'Admin'
                               ? Colors.red[50]
                               : Colors.blue[50],
                           borderRadius: BorderRadius.circular(4),
@@ -186,7 +186,7 @@ class _UserCardState extends State<UserCard> {
                           role,
                           style: TextStyle(
                             fontSize: 10,
-                            color: role == 'ADMIN' ? Colors.red : Colors.blue,
+                            color: role == 'Admin' ? Colors.red : Colors.blue,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

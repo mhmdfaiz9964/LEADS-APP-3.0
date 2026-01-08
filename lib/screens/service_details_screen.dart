@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/models/customer_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/theme/app_theme.dart';
@@ -8,15 +8,15 @@ import 'package:leads_manager/screens/customer_details_screen.dart';
 import 'package:leads_manager/screens/add_customer_screen.dart';
 import 'package:flutter/cupertino.dart';
 
-class LabelDetailsScreen extends StatefulWidget {
-  final LabelModel label;
-  const LabelDetailsScreen({super.key, required this.label});
+class ServiceDetailsScreen extends StatefulWidget {
+  final ServiceModel service;
+  const ServiceDetailsScreen({super.key, required this.service});
 
   @override
-  State<LabelDetailsScreen> createState() => _LabelDetailsScreenState();
+  State<ServiceDetailsScreen> createState() => _ServiceDetailsScreenState();
 }
 
-class _LabelDetailsScreenState extends State<LabelDetailsScreen> {
+class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   void _confirmDelete(BuildContext context, Customer customer) {
     showCupertinoDialog(
       context: context,
@@ -46,8 +46,8 @@ class _LabelDetailsScreenState extends State<LabelDetailsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: Text(widget.label.name),
-        backgroundColor: AppTheme.appBarGreen,
+        title: Text(widget.service.name),
+        backgroundColor: AppTheme.appBarBlue,
         elevation: 0,
       ),
       body: Column(
@@ -61,14 +61,16 @@ class _LabelDetailsScreenState extends State<LabelDetailsScreen> {
           ),
           Expanded(
             child: StreamBuilder<List<Customer>>(
-              stream: DatabaseService().getCustomersByLabel(widget.label.id),
+              stream: DatabaseService().getCustomersByService(
+                widget.service.id,
+              ),
               builder: (context, snapshot) {
                 if (!snapshot.hasData)
                   return const Center(child: CircularProgressIndicator());
                 final customers = snapshot.data!;
                 if (customers.isEmpty)
                   return const Center(
-                    child: Text("No customers assigned to this label"),
+                    child: Text("No customers assigned to this service"),
                   );
 
                 return ListView.builder(
@@ -125,7 +127,7 @@ class _RecordCardState extends State<RecordCard> {
       context: context,
       builder: (context) => CupertinoActionSheet(
         title: Text(customer.name),
-        message: Text(customer.company),
+        message: Text(customer.agentName),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -193,14 +195,14 @@ class _RecordCardState extends State<RecordCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.person, color: Color(0xFF2E5A4B), size: 36),
+                  const Icon(Icons.person, color: Color(0xFF0046FF), size: 36),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${widget.customer.name} (${widget.customer.company})",
+                          "${widget.customer.name} (${widget.customer.agentName})",
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

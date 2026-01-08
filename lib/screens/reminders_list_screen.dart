@@ -20,7 +20,7 @@ class RemindersListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: const Text("Reminders"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

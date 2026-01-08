@@ -10,12 +10,12 @@ import '../services/notification_service.dart';
 import '../models/notification_model.dart';
 import 'leads_screen.dart';
 import 'customers_screen.dart';
-import 'labels_screen.dart';
+import 'services_screen.dart';
 import 'reminders_screen.dart';
 import 'cart_screen.dart';
 import 'add_lead_screen.dart';
 import 'add_customer_screen.dart';
-import 'add_label_screen.dart';
+import 'add_service_screen.dart';
 import 'add_reminder_screen.dart';
 import 'notifications_screen.dart';
 import 'business_screen.dart';
@@ -218,7 +218,7 @@ class _MainScreenState extends State<MainScreen> {
         page = const AddCustomerScreen();
         break;
       case 2:
-        page = const AddLabelScreen();
+        page = const AddServiceScreen(); // Will rename screen later
         break;
       case 3:
         page = const AddReminderScreen();
@@ -243,7 +243,7 @@ class _MainScreenState extends State<MainScreen> {
         fabLabel = "Customer";
         break;
       case 2:
-        fabLabel = "Label";
+        fabLabel = "Service";
         break;
       case 3:
         fabLabel = "Reminder";
@@ -255,7 +255,7 @@ class _MainScreenState extends State<MainScreen> {
     final List<String> titles = [
       "Leads",
       "Customers",
-      "Labels",
+      "Services",
       "Reminders",
       "Cart",
     ];
@@ -352,7 +352,7 @@ class _MainScreenState extends State<MainScreen> {
                                 color: AppTheme.secondaryOrange,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: AppTheme.appBarGreen,
+                                  color: AppTheme.appBarBlue,
                                   width: 1.5,
                                 ),
                               ),
@@ -400,7 +400,7 @@ class _MainScreenState extends State<MainScreen> {
       body: _buildCurrentScreen(),
       floatingActionButton:
           (_currentIndex == 4 ||
-              (_currentIndex == 2 && auth.currentUser?.role != 'admin'))
+              (_currentIndex == 2 && auth.currentUser?.role != 'Admin'))
           ? null
           : Column(
               mainAxisSize: MainAxisSize.min,
@@ -459,7 +459,7 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         return const CustomersScreen();
       case 2:
-        return const LabelsScreen();
+        return const ServicesScreen();
       case 3:
         return const RemindersScreen();
       case 4:

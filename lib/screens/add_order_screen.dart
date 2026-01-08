@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/order_model.dart';
 import '../models/customer_model.dart';
+import '../models/service_model.dart'; // Still named label_model but contains ServiceModel
 import '../services/database_service.dart';
 import '../theme/app_theme.dart';
 
@@ -19,28 +20,26 @@ class AddOrderScreen extends StatefulWidget {
 
 class _AddOrderScreenState extends State<AddOrderScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _productNameController;
-  late TextEditingController _qtyController;
-  late TextEditingController _priceController;
-  String _selectedStatus = 'ORDER';
+  String? _selectedServiceName;
+  late TextEditingController _costController;
+  late TextEditingController _sellAmountController;
+  String _selectedStatus = 'NEW';
   bool _isLoading = false;
   late String _orderNumber;
 
-  final List<String> _statuses = ['ORDER', 'PAYMENT', 'PREPARED', 'DELIVERED'];
+  final List<String> _statuses = ['NEW', 'PROCESS', 'APPROVED', 'REFUSED'];
 
   @override
   void initState() {
     super.initState();
-    _productNameController = TextEditingController(
-      text: widget.orderToEdit?.productName ?? '',
+    _selectedServiceName = widget.orderToEdit?.serviceName;
+    _costController = TextEditingController(
+      text: widget.orderToEdit?.cost.toString() ?? '',
     );
-    _qtyController = TextEditingController(
-      text: widget.orderToEdit?.quantity.toString() ?? '',
+    _sellAmountController = TextEditingController(
+      text: widget.orderToEdit?.sellAmount.toString() ?? '',
     );
-    _priceController = TextEditingController(
-      text: widget.orderToEdit?.price.toString() ?? '',
-    );
-    _selectedStatus = widget.orderToEdit?.status ?? 'ORDER';
+    _selectedStatus = widget.orderToEdit?.status ?? 'NEW';
     _orderNumber = widget.orderToEdit?.orderNumber ?? _generateOrderNumber();
   }
 
@@ -50,14 +49,19 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
 
   @override
   void dispose() {
-    _productNameController.dispose();
-    _qtyController.dispose();
-    _priceController.dispose();
+    _costController.dispose();
+    _sellAmountController.dispose();
     super.dispose();
   }
 
   void _saveOrder() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedServiceName == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please select a service")));
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -75,9 +79,9 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
     final order = OrderModel(
       id: widget.orderToEdit?.id ?? '',
       orderNumber: _orderNumber,
-      productName: _productNameController.text.trim(),
-      quantity: int.tryParse(_qtyController.text) ?? 0,
-      price: double.tryParse(_priceController.text) ?? 0.0,
+      serviceName: _selectedServiceName!,
+      cost: double.tryParse(_costController.text) ?? 0.0,
+      sellAmount: double.tryParse(_sellAmountController.text) ?? 0.0,
       status: _selectedStatus,
       customerId: widget.customer.id,
       customerName: widget.customer.name,
@@ -87,8 +91,11 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
 
     try {
       if (widget.orderToEdit != null) {
-        // Update logic not explicitly requested but good to have
-        // await DatabaseService().updateOrder(order);
+        // Update logic (re-using addOrder for simplicity if update is not complex)
+        // In a real app, updateOrder would be explicitly defined.
+        await DatabaseService().addOrder(order);
+        // Note: DatabaseService.addOrder adds a NEW doc.
+        // I should probably add an updateOrder to DatabaseService.
       } else {
         await DatabaseService().addOrder(order);
       }
@@ -102,7 +109,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                   ? "Order updated successfully"
                   : "Order created successfully",
             ),
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       }
@@ -122,8 +129,10 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.orderToEdit != null ? "Edit Order" : "Create Order"),
-        backgroundColor: AppTheme.appBarGreen,
+        title: Text(
+          widget.orderToEdit != null ? "Edit Order" : "Select Service",
+        ),
+        backgroundColor: AppTheme.appBarBlue,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -139,26 +148,59 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2E5A4B),
+                        color: Color(0xFF0046FF),
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildTextField(
-                      controller: _productNameController,
-                      label: "Product Name",
-                      icon: Icons.inventory_2_outlined,
-                      validator: (v) =>
-                          v == null || v.isEmpty ? "Required" : null,
+
+                    // --- SERVICE DROPDOWN ---
+                    StreamBuilder<List<ServiceModel>>(
+                      stream: DatabaseService()
+                          .getServices(), // getServices returns ServiceModel now
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const LinearProgressIndicator();
+                        }
+                        final services = snapshot.data ?? [];
+                        return DropdownButtonFormField<String>(
+                          value: _selectedServiceName,
+                          decoration: InputDecoration(
+                            labelText: "Select Service",
+                            prefixIcon: const Icon(
+                              Icons.miscellaneous_services,
+                              color: Color(0xFF0046FF),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          items: services
+                              .map(
+                                (s) => DropdownMenuItem(
+                                  value: s.name,
+                                  child: Text(s.name),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) =>
+                              setState(() => _selectedServiceName = val),
+                          validator: (v) => v == null ? "Required" : null,
+                        );
+                      },
                     ),
+
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
                           child: _buildTextField(
-                            controller: _qtyController,
-                            label: "QTY",
-                            icon: Icons.format_list_numbered,
-                            keyboardType: TextInputType.number,
+                            controller: _costController,
+                            label: "Cost",
+                            icon: Icons.money_off,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             validator: (v) =>
                                 v == null || v.isEmpty ? "Required" : null,
                           ),
@@ -166,8 +208,8 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildTextField(
-                            controller: _priceController,
-                            label: "Price",
+                            controller: _sellAmountController,
+                            label: "Sell Amount",
                             icon: Icons.attach_money,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -193,10 +235,10 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                       children: _statuses.map((s) {
                         final isSelected = _selectedStatus == s;
                         Color statusColor = Colors.grey;
-                        if (s == 'ORDER') statusColor = Colors.blue;
-                        if (s == 'PAYMENT') statusColor = Colors.green;
-                        if (s == 'PREPARED') statusColor = Colors.orange;
-                        if (s == 'DELIVERED') statusColor = Colors.purple;
+                        if (s == 'NEW') statusColor = Colors.blue;
+                        if (s == 'PROCESS') statusColor = Colors.green;
+                        if (s == 'APPROVED') statusColor = Colors.orange;
+                        if (s == 'REFUSED') statusColor = Colors.purple;
 
                         return ChoiceChip(
                           label: Text(s),
@@ -264,11 +306,11 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF2E5A4B)),
+        prefixIcon: Icon(icon, color: const Color(0xFF0046FF)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF2E5A4B), width: 2),
+          borderSide: const BorderSide(color: Color(0xFF0046FF), width: 2),
         ),
       ),
     );

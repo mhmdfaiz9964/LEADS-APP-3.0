@@ -29,7 +29,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
     _fullNameController = TextEditingController(text: u?['fullName'] ?? "");
     _emailController = TextEditingController(text: u?['email'] ?? "");
     _passwordController = TextEditingController();
-    _role = u?['role'] ?? 'user';
+    _role = u?['role'] ?? 'User';
   }
 
   @override
@@ -105,7 +105,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
             const SnackBar(
               content: Text('User created successfully'),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: AppTheme.primaryGreen,
+              backgroundColor: AppTheme.primaryBlue,
             ),
           );
           Navigator.pop(context);
@@ -168,11 +168,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
                   isExpanded: true,
                   items: const [
                     DropdownMenuItem(
-                      value: 'user',
+                      value: 'User',
                       child: Text('Standard User'),
                     ),
                     DropdownMenuItem(
-                      value: 'admin',
+                      value: 'Admin',
                       child: Text('Administrator'),
                     ),
                   ],
@@ -187,7 +187,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGreen,
+                  backgroundColor: AppTheme.primaryBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

@@ -18,7 +18,7 @@ class CustomerOrdersScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text("${customer.name}'s Orders"),
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle),
@@ -85,10 +85,10 @@ class OrderCard extends StatelessWidget {
         title: const Text("Update Status"),
         content: const Text("Select new status for this order."),
         actions: [
-          _buildStatusAction(ctx, "ORDER", Colors.blue),
-          _buildStatusAction(ctx, "PAYMENT", Colors.green),
-          _buildStatusAction(ctx, "PREPARED", Colors.orange),
-          _buildStatusAction(ctx, "DELIVERED", Colors.purple),
+          _buildStatusAction(ctx, "NEW", Colors.blue),
+          _buildStatusAction(ctx, "PROCESS", Colors.green),
+          _buildStatusAction(ctx, "APPROVED", Colors.orange),
+          _buildStatusAction(ctx, "REFUSED", Colors.purple),
           CupertinoDialogAction(
             child: const Text("Cancel"),
             onPressed: () => Navigator.pop(ctx),
@@ -119,10 +119,10 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor = Colors.grey;
-    if (order.status == 'ORDER') statusColor = Colors.blue;
-    if (order.status == 'PAYMENT') statusColor = Colors.green;
-    if (order.status == 'PREPARED') statusColor = Colors.orange;
-    if (order.status == 'DELIVERED') statusColor = Colors.purple;
+    if (order.status == 'NEW') statusColor = Colors.blue;
+    if (order.status == 'PROCESS') statusColor = Colors.green;
+    if (order.status == 'APPROVED') statusColor = Colors.orange;
+    if (order.status == 'REFUSED') statusColor = Colors.purple;
 
     return GestureDetector(
       onLongPress: () => _showStatusDialog(context),
@@ -150,18 +150,18 @@ class OrderCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "\$${order.price.toStringAsFixed(2)}",
+                    "\$${order.sellAmount.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryGreen,
+                      color: AppTheme.primaryBlue,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                order.productName,
+                order.serviceName,
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
@@ -199,7 +199,7 @@ class OrderCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                "QTY: ${order.quantity}",
+                "Cost: \$${order.cost.toStringAsFixed(2)}",
                 style: const TextStyle(fontSize: 14, color: Colors.blueGrey),
               ),
             ],

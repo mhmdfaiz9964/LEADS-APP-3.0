@@ -94,7 +94,7 @@ class NotificationService {
   Future<void> _initOneSignal() async {
     // NOTE: Replace with your actual OneSignal App ID
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    OneSignal.initialize("f6ca7c14-76ab-41f7-ab9d-b51cd7db1dc0");
+    OneSignal.initialize("8d220843-6907-47d0-a02d-8692bc023b31");
 
     // Request permission for push notifications
     OneSignal.Notifications.requestPermission(true);
@@ -234,11 +234,11 @@ class NotificationService {
     if (sendAt.isBefore(DateTime.now())) return;
 
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
-    final appId = "f6ca7c14-76ab-41f7-ab9d-b51cd7db1dc0";
+    final appId = "8d220843-6907-47d0-a02d-8692bc023b31";
     final restKey =
-        "os_v2_app_63fhyfdwvna7pk45wuonpwy5yb2revaih5yuq2vubbsmjk7yorcg35gq64h365uiipjmwnos7loevacze6vdftzfikyxnvdvs3qjlqa"; // WARNING: Keep this secure!
+        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3gev46kz6sokuktegxhqmkhtrnwooagndp57um3cawnfxi7buwnm7lpi5o7b54nma7kfxdaktnf6jofq"; // WARNING: Keep this secure!
 
-    // Targets: The user who added the reminder and anyone with tag 'role': 'admin'
+    // Targets: The user who added the reminder and anyone with tag 'role': 'Admin'
     final body = jsonEncode({
       "app_id": appId,
       "headings": {"en": "Reminder Incoming!"},
@@ -252,7 +252,7 @@ class NotificationService {
           ' UTC',
       "include_external_user_ids": [creatorEmail],
       "filters": [
-        {"field": "tag", "key": "role", "relation": "=", "value": "admin"},
+        {"field": "tag", "key": "role", "relation": "=", "value": "Admin"},
       ],
       "android_sound": "default", // Uses system default sound
       "ios_sound": "default",
@@ -282,9 +282,9 @@ class NotificationService {
     if (user == null || user.email == null) return;
 
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
-    final appId = "f6ca7c14-76ab-41f7-ab9d-b51cd7db1dc0";
+    final appId = "8d220843-6907-47d0-a02d-8692bc023b31";
     final restKey =
-        "os_v2_app_63fhyfdwvna7pk45wuonpwy5yb2revaih5yuq2vubbsmjk7yorcg35gq64h365uiipjmwnos7loevacze6vdftzfikyxnvdvs3qjlqa";
+        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3gev46kz6sokuktegxhqmkhtrnwooagndp57um3cawnfxi7buwnm7lpi5o7b54nma7kfxdaktnf6jofq";
 
     final body = jsonEncode({
       "app_id": appId,

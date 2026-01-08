@@ -28,7 +28,7 @@ class CustomBottomNav extends StatelessWidget {
             children: [
               _buildNavItem(0, "Leads", Icons.ads_click),
               _buildNavItem(1, "Customers", Icons.person),
-              _buildNavItem(2, "Labels", Icons.label),
+              _buildNavItem(2, "Services", Icons.miscellaneous_services),
               _buildNavItem(3, "Reminders", Icons.notifications),
               _buildNavItem(4, "Cart", Icons.shopping_cart),
             ],
@@ -40,7 +40,7 @@ class CustomBottomNav extends StatelessWidget {
 
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? AppTheme.primaryGreen : Colors.grey;
+    final color = isSelected ? AppTheme.primaryBlue : Colors.grey;
     final showBadge = index == 3 && remindersBadgeCount > 0;
 
     return GestureDetector(

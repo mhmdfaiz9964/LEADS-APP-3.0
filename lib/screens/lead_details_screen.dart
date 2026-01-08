@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:leads_manager/models/lead_model.dart';
 import 'package:leads_manager/models/reminder_model.dart';
 import 'package:leads_manager/models/note_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leads_manager/screens/add_reminder_screen.dart';
-import 'package:leads_manager/screens/select_lead_labels_screen.dart';
+import 'package:leads_manager/screens/select_lead_services_screen.dart';
 import 'package:leads_manager/screens/reminders_list_screen.dart';
 import 'package:leads_manager/screens/notes_screen.dart';
 
@@ -75,7 +75,7 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('leads')
+          .collection('booking_leads')
           .doc(widget.lead.id)
           .snapshots(),
       builder: (context, snapshot) {
@@ -88,7 +88,7 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F5F5),
           appBar: AppBar(
-            backgroundColor: AppTheme.appBarGreen,
+            backgroundColor: AppTheme.appBarBlue,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -111,7 +111,7 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
                 // Header Section
                 Container(
                   width: double.infinity,
-                  color: AppTheme.appBarGreen,
+                  color: AppTheme.appBarBlue,
                   padding: const EdgeInsets.only(bottom: 24),
                   child: Column(
                     children: [
@@ -164,6 +164,72 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
                   ),
                 ),
 
+                // Profile Info Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "PROFILE INFORMATION",
+                          style: TextStyle(
+                            color: Color(0xFFB37424),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildInfoRow(
+                          Icons.person_outline,
+                          "Agent Name",
+                          lead.agentName,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(Icons.phone, "Phone", lead.phone),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(
+                          Icons.email_outlined,
+                          "Email",
+                          lead.email,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(
+                          Icons.location_on_outlined,
+                          "Address",
+                          lead.address,
+                        ),
+                        const SizedBox(height: 8),
+                        if (lead.passportNumber != null &&
+                            lead.passportNumber!.isNotEmpty)
+                          _buildInfoRow(
+                            Icons.assignment_ind_outlined,
+                            "Passport Number",
+                            lead.passportNumber!,
+                          ),
+                        if (lead.dob != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: _buildInfoRow(
+                              Icons.cake_outlined,
+                              "Date of Birth",
+                              DateFormat('MMM d, yyyy').format(lead.dob!),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
                 // Dashboard Cards
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -175,14 +241,15 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
                       _buildDashboardCard(
                         icon: Icons.label,
                         color: const Color(0xFF3498DB),
-                        title: "ADD LABELS",
+                        title: "ADD SERVICES",
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => SelectLeadLabelsScreen(lead: lead),
+                            builder: (_) =>
+                                SelectLeadServicesScreen(lead: lead),
                           ),
                         ),
-                        trailing: _buildLabelChips(lead.labelIds),
+                        trailing: _buildServiceChips(lead.serviceIds),
                       ),
                       const SizedBox(height: 8),
                       _buildDashboardCard(
@@ -273,6 +340,37 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
         ),
         const SizedBox(height: 8),
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: Colors.grey[600]),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -490,19 +588,19 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
     );
   }
 
-  Widget _buildLabelChips(List<String> labelIds) {
+  Widget _buildServiceChips(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
                 (l) => Container(
                   padding: const EdgeInsets.symmetric(

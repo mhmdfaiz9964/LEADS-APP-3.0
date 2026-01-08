@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../theme/app_theme.dart';
-import '../../models/label_model.dart';
-import '../../services/database_service.dart';
+import '../models/service_model.dart';
+import '../services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-class AddLabelScreen extends StatefulWidget {
-  final LabelModel? labelToEdit;
-  const AddLabelScreen({super.key, this.labelToEdit});
+class AddServiceScreen extends StatefulWidget {
+  final ServiceModel? serviceToEdit;
+  const AddServiceScreen({super.key, this.serviceToEdit});
 
   @override
-  State<AddLabelScreen> createState() => _AddLabelScreenState();
+  State<AddServiceScreen> createState() => _AddServiceScreenState();
 }
 
-class _AddLabelScreenState extends State<AddLabelScreen> {
+class _AddServiceScreenState extends State<AddServiceScreen> {
   late TextEditingController _nameController;
   late Color _selectedColor;
   bool _isLoading = false;
@@ -38,10 +37,10 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(
-      text: widget.labelToEdit?.name ?? "",
+      text: widget.serviceToEdit?.name ?? "",
     );
-    _selectedColor = widget.labelToEdit != null
-        ? widget.labelToEdit!.color
+    _selectedColor = widget.serviceToEdit != null
+        ? widget.serviceToEdit!.color
         : Colors.black;
   }
 
@@ -67,9 +66,9 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
     );
   }
 
-  void _saveLabel() async {
+  void _saveService() async {
     if (_nameController.text.isEmpty) {
-      _showFeedback("Error", "Label name cannot be empty.");
+      _showFeedback("Error", "Service name cannot be empty.");
       return;
     }
 
@@ -82,27 +81,29 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
       return;
     }
 
-    final label = LabelModel(
-      id: widget.labelToEdit?.id ?? '',
+    final service = ServiceModel(
+      id: widget.serviceToEdit?.id ?? '',
       name: _nameController.text.toUpperCase(),
       colorValue: _selectedColor.value,
-      creatorEmail: widget.labelToEdit?.creatorEmail ?? userEmail,
+      creatorEmail: widget.serviceToEdit?.creatorEmail ?? userEmail,
     );
 
     try {
-      if (widget.labelToEdit != null) {
-        await DatabaseService().updateLabel(label);
+      if (widget.serviceToEdit != null) {
+        await DatabaseService().updateService(service);
       } else {
-        await DatabaseService().addLabel(label);
+        await DatabaseService().addService(service);
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              widget.labelToEdit != null ? "Label updated" : "Label created",
+              widget.serviceToEdit != null
+                  ? "Service updated"
+                  : "Service created",
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
         Navigator.pop(context);
@@ -116,13 +117,13 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.labelToEdit != null;
+    final isEditing = widget.serviceToEdit != null;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: Text(
-          isEditing ? "Edit Label" : "Add Label",
+          isEditing ? "Edit Service" : "Add Service",
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -146,7 +147,7 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: "New Label Name",
+                  labelText: "New Service Name",
                   labelStyle: TextStyle(color: Colors.grey),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.secondaryOrange),
@@ -207,7 +208,7 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
                   ),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: _isLoading ? null : _saveLabel,
+                    onPressed: _isLoading ? null : _saveService,
                     child: const Text(
                       "OK",
                       style: TextStyle(

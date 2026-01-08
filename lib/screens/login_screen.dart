@@ -50,8 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (error != null) {
       bool isSampleUser =
-          (email == 'admin@leadsmanager.com' ||
-          email == 'user@leadsmanager.com');
+          (email == 'admin@selfholidays.com' ||
+          email == 'user@selfholidays.com');
       if (isSampleUser) {
         String? signupError = await authService.signUp(email, password);
         if (signupError == null) {
@@ -82,18 +82,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.1),
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.hub_outlined,
                     size: 64,
-                    color: AppTheme.primaryGreen,
+                    color: AppTheme.primaryBlue,
                   ),
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  "Leads Manager",
+                  "Booking App",
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -135,7 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? const CupertinoActivityIndicator(color: Colors.white)
                         : Text(
                             "SIGN IN",
-                            style: GoogleFonts.roboto( // Changed to Roboto
+                            style: GoogleFonts.roboto(
+                              // Changed to Roboto
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
@@ -146,7 +147,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 40),
                 Text(
                   "QUICK DEMO ACCOUNTS",
-                  style: GoogleFonts.roboto( // Changed to Roboto
+                  style: GoogleFonts.roboto(
+                    // Changed to Roboto
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey[400],
@@ -156,14 +158,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 _buildDemoTile(
                   "ADMINISTRATOR",
-                  "admin@leadsmanager.com",
+                  "admin@selfholidays.com",
                   "admin123",
                   Colors.blue,
                 ),
                 const SizedBox(height: 12),
                 _buildDemoTile(
                   "STANDARD USER",
-                  "user@leadsmanager.com",
+                  "user@selfholidays.com",
                   "user123",
                   Colors.orange,
                 ),

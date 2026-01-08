@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:leads_manager/models/customer_model.dart';
 import 'package:leads_manager/models/reminder_model.dart';
 import 'package:leads_manager/models/note_model.dart';
-import 'package:leads_manager/models/label_model.dart';
+import 'package:leads_manager/models/service_model.dart';
 import 'package:leads_manager/services/database_service.dart';
 import 'package:leads_manager/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leads_manager/screens/add_reminder_screen.dart';
-import 'package:leads_manager/screens/select_customer_labels_screen.dart';
+import 'package:leads_manager/screens/select_customer_services_screen.dart';
 import 'package:leads_manager/screens/reminders_list_screen.dart';
 import 'package:leads_manager/screens/notes_screen.dart';
 import 'package:leads_manager/screens/add_order_screen.dart';
@@ -78,7 +78,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('customers')
+          .collection('booking_customers')
           .doc(widget.customer.id)
           .snapshots(),
       builder: (context, snapshot) {
@@ -91,7 +91,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F5F5),
           appBar: AppBar(
-            backgroundColor: AppTheme.appBarGreen,
+            backgroundColor: AppTheme.appBarBlue,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -114,7 +114,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 // Header Section
                 Container(
                   width: double.infinity,
-                  color: AppTheme.appBarGreen,
+                  color: AppTheme.appBarBlue,
                   padding: const EdgeInsets.only(bottom: 24),
                   child: Column(
                     children: [
@@ -166,6 +166,71 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                     ],
                   ),
                 ),
+                // Profile Info Card
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "PROFILE INFORMATION",
+                          style: TextStyle(
+                            color: Color(0xFFB37424),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildInfoRow(
+                          Icons.person_outline,
+                          "Agent Name",
+                          customer.agentName,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(Icons.phone, "Phone", customer.phone),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(
+                          Icons.email_outlined,
+                          "Email",
+                          customer.email,
+                        ),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(
+                          Icons.location_on_outlined,
+                          "Address",
+                          customer.address,
+                        ),
+                        const SizedBox(height: 8),
+                        if (customer.passportNumber != null &&
+                            customer.passportNumber!.isNotEmpty)
+                          _buildInfoRow(
+                            Icons.assignment_ind_outlined,
+                            "Passport Number",
+                            customer.passportNumber!,
+                          ),
+                        if (customer.dob != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: _buildInfoRow(
+                              Icons.cake_outlined,
+                              "Date of Birth",
+                              DateFormat('MMM d, yyyy').format(customer.dob!),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
 
                 // Dashboard Cards
                 Padding(
@@ -178,15 +243,16 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       _buildDashboardCard(
                         icon: Icons.label,
                         color: const Color(0xFF3498DB),
-                        title: "ADD LABELS",
+                        title: "ADD SERVICES",
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                SelectCustomerLabelsScreen(customer: customer),
+                            builder: (_) => SelectCustomerServicesScreen(
+                              customer: customer,
+                            ),
                           ),
                         ),
-                        trailing: _buildLabelChips(customer.labelIds),
+                        trailing: _buildServiceChips(customer.serviceIds),
                       ),
                       const SizedBox(height: 8),
                       _buildDashboardCard(
@@ -307,6 +373,37 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         ),
         const SizedBox(height: 8),
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: Colors.grey[600]),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -529,14 +626,14 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "Order #${order.orderNumber}",
+                                          "Service #${order.orderNumber}",
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                           ),
                                         ),
                                         Text(
-                                          "${order.productName} - \$${order.price.toStringAsFixed(2)}",
+                                          "${order.serviceName} - \$${order.sellAmount.toStringAsFixed(2)}",
                                           style: const TextStyle(
                                             fontSize: 11,
                                             color: Colors.grey,
@@ -580,19 +677,19 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     );
   }
 
-  Widget _buildLabelChips(List<String> labelIds) {
+  Widget _buildServiceChips(List<String> labelIds) {
     if (labelIds.isEmpty) return const SizedBox.shrink();
-    return FutureBuilder<List<LabelModel>>(
-      future: DatabaseService().getLabels().first,
+    return FutureBuilder<List<ServiceModel>>(
+      future: DatabaseService().getServices().first,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const SizedBox.shrink();
-        final selectedLabels = snapshot.data!
+        final selectedServices = snapshot.data!
             .where((l) => labelIds.contains(l.id))
             .toList();
         return Wrap(
           spacing: 4,
           runSpacing: 4,
-          children: selectedLabels
+          children: selectedServices
               .map(
                 (l) => Container(
                   padding: const EdgeInsets.symmetric(

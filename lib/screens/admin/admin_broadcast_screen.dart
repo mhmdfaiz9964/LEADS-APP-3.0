@@ -169,7 +169,7 @@ class _AdminBroadcastScreenState extends State<AdminBroadcastScreen> {
               child: ElevatedButton(
                 onPressed: _isSending ? null : _sendBroadcast,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGreen,
+                  backgroundColor: AppTheme.primaryBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

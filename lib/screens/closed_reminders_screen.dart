@@ -14,7 +14,7 @@ class ClosedRemindersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.currentUser;
-    final isAdmin = user?.role == 'admin';
+    final isAdmin = user?.role == 'Admin';
     final filterEmail = isAdmin ? null : user?.email;
 
     return StreamBuilder<List<Reminder>>(
@@ -89,12 +89,12 @@ class ClosedRemindersScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryBlue.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.check_circle,
-                color: AppTheme.primaryGreen,
+                color: AppTheme.primaryBlue,
                 size: 20,
               ),
             ),

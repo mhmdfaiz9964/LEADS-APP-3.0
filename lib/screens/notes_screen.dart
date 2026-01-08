@@ -53,7 +53,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -79,7 +79,7 @@ class _NotesScreenState extends State<NotesScreen> {
                     children: [
                       const Icon(
                         Icons.person,
-                        color: Color(0xFF2E5A4B),
+                        color: Color(0xFF0046FF),
                         size: 28,
                       ),
                       const SizedBox(width: 12),
@@ -98,7 +98,7 @@ class _NotesScreenState extends State<NotesScreen> {
                     children: [
                       const Icon(
                         Icons.edit_note,
-                        color: Color(0xFF2E5A4B),
+                        color: Color(0xFF0046FF),
                         size: 28,
                       ),
                       const SizedBox(width: 12),

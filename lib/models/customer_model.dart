@@ -3,48 +3,56 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Customer {
   final String id;
   final String name;
-  final String company;
+  final String agentName; // Renamed from company
   final String phone;
   final String email;
   final String address;
   final String notes;
   final String plan;
-  final List<String> labelIds;
+  final List<String> serviceIds;
   final bool isPinned;
-  final String? status; // ORDER, PAYMENT_APPROVED, PREPARED, DELIVERED
+  final String? status; // NEW, PROCESS, APPROVED, REFUSED
   final DateTime createdAt;
   final String? creatorEmail;
+  final String? passportNumber;
+  final DateTime? dob;
 
   Customer({
     required this.id,
     required this.name,
-    required this.company,
+    required this.agentName,
     required this.phone,
     required this.email,
     required this.address,
     required this.notes,
     this.plan = 'Standard',
-    this.labelIds = const [],
+    this.serviceIds = const [],
     this.isPinned = false,
     this.status,
     required this.createdAt,
     this.creatorEmail,
+    this.passportNumber,
+    this.dob,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'company': company,
+      'agentName': agentName,
+      'company': agentName, // Keep company for backward compatibility if needed
       'phone': phone,
       'email': email,
       'address': address,
       'notes': notes,
       'plan': plan,
-      'labelIds': labelIds,
+      'serviceIds': serviceIds,
+      'labelIds': serviceIds,
       'isPinned': isPinned,
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
       'creatorEmail': creatorEmail,
+      'passportNumber': passportNumber,
+      'dob': dob != null ? Timestamp.fromDate(dob!) : null,
     };
   }
 
@@ -53,51 +61,59 @@ class Customer {
     return Customer(
       id: doc.id,
       name: data['name'] ?? '',
-      company: data['company'] ?? '',
+      agentName: data['agentName'] ?? data['company'] ?? '',
       phone: data['phone'] ?? '',
       email: data['email'] ?? '',
       address: data['address'] ?? '',
       notes: data['notes'] ?? '',
       plan: data['plan'] ?? 'Standard',
-      labelIds: data['labelIds'] != null
-          ? List<String>.from(data['labelIds'])
-          : (data['labelId'] != null ? [data['labelId']] : []),
+      serviceIds: data['serviceIds'] != null
+          ? List<String>.from(data['serviceIds'])
+          : (data['labelIds'] != null
+                ? List<String>.from(data['labelIds'])
+                : (data['labelId'] != null ? [data['labelId']] : [])),
       isPinned: data['isPinned'] ?? false,
       status: data['status'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       creatorEmail: data['creatorEmail'],
+      passportNumber: data['passportNumber'],
+      dob: (data['dob'] as Timestamp?)?.toDate(),
     );
   }
 
   Customer copyWith({
     String? id,
     String? name,
-    String? company,
+    String? agentName,
     String? phone,
     String? email,
     String? address,
     String? notes,
     String? plan,
-    List<String>? labelIds,
+    List<String>? serviceIds,
     bool? isPinned,
     String? status,
     DateTime? createdAt,
     String? creatorEmail,
+    String? passportNumber,
+    DateTime? dob,
   }) {
     return Customer(
       id: id ?? this.id,
       name: name ?? this.name,
-      company: company ?? this.company,
+      agentName: agentName ?? this.agentName,
       phone: phone ?? this.phone,
       email: email ?? this.email,
       address: address ?? this.address,
       notes: notes ?? this.notes,
       plan: plan ?? this.plan,
-      labelIds: labelIds ?? this.labelIds,
+      serviceIds: serviceIds ?? this.serviceIds,
       isPinned: isPinned ?? this.isPinned,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       creatorEmail: creatorEmail ?? this.creatorEmail,
+      passportNumber: passportNumber ?? this.passportNumber,
+      dob: dob ?? this.dob,
     );
   }
 }

@@ -141,7 +141,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Business profile saved successfully'),
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       }
@@ -173,7 +173,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.appBarGreen,
+        backgroundColor: AppTheme.appBarBlue,
         title: const Text(
           'Business Profile',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -196,8 +196,8 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppTheme.appBarGreen,
-                    AppTheme.appBarGreen.withOpacity(0.8),
+                    AppTheme.appBarBlue,
+                    AppTheme.appBarBlue.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -226,7 +226,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                               : const Icon(
                                   Icons.business,
                                   size: 60,
-                                  color: AppTheme.appBarGreen,
+                                  color: AppTheme.appBarBlue,
                                 ),
                         ),
                       ),
@@ -411,7 +411,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppTheme.appBarGreen),
+        prefixIcon: Icon(icon, color: AppTheme.appBarBlue),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -419,7 +419,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppTheme.appBarGreen, width: 2),
+          borderSide: const BorderSide(color: AppTheme.appBarBlue, width: 2),
         ),
       ),
     );
