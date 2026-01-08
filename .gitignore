@@ -49,3 +49,6 @@ app.*.map.json
 google-services.json
 GoogleService-Info.plist
 
+
+# App Secrets
+lib/config/secrets.dart

@@ -9,6 +9,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import '../config/secrets.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -94,7 +95,7 @@ class NotificationService {
   Future<void> _initOneSignal() async {
     // NOTE: Replace with your actual OneSignal App ID
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    OneSignal.initialize("8d220843-6907-47d0-a02d-8692bc023b31");
+    OneSignal.initialize(Secrets.oneSignalAppId);
 
     // Request permission for push notifications
     OneSignal.Notifications.requestPermission(true);
@@ -234,9 +235,8 @@ class NotificationService {
     if (sendAt.isBefore(DateTime.now())) return;
 
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
-    final appId = "8d220843-6907-47d0-a02d-8692bc023b31";
-    final restKey =
-        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3gev46kz6sokuktegxhqmkhtrnwooagndp57um3cawnfxi7buwnm7lpi5o7b54nma7kfxdaktnf6jofq"; // WARNING: Keep this secure!
+    final appId = Secrets.oneSignalAppId;
+    final restKey = Secrets.oneSignalRestKey;
 
     // Targets: The user who added the reminder and anyone with tag 'role': 'Admin'
     final body = jsonEncode({
@@ -282,9 +282,8 @@ class NotificationService {
     if (user == null || user.email == null) return;
 
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
-    final appId = "8d220843-6907-47d0-a02d-8692bc023b31";
-    final restKey =
-        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3ggv5c6frhgbu77eohw35boo2dec7zai5tbgorhaq6o4e56gtqqw5ddazddfjrcczxsvlzh5ftf2672i";
+    final appId = Secrets.oneSignalAppId;
+    final restKey = Secrets.oneSignalRestKey;
 
     final body = jsonEncode({
       "app_id": appId,
