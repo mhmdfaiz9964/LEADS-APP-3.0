@@ -284,7 +284,7 @@ class NotificationService {
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
     final appId = "8d220843-6907-47d0-a02d-8692bc023b31";
     final restKey =
-        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3gev46kz6sokuktegxhqmkhtrnwooagndp57um3cawnfxi7buwnm7lpi5o7b54nma7kfxdaktnf6jofq";
+        "os_v2_app_ruraqq3ja5d5bibnq2jlyar3ggv5c6frhgbu77eohw35boo2dec7zai5tbgorhaq6o4e56gtqqw5ddazddfjrcczxsvlzh5ftf2672i";
 
     final body = jsonEncode({
       "app_id": appId,
@@ -296,17 +296,47 @@ class NotificationService {
     });
 
     try {
-      final response = await http.post(
+      // Ensure no whitespace
+      final cleanKey = restKey.trim();
+
+      var response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Authorization": "Basic $restKey",
+          "Authorization": "Basic $cleanKey",
         },
         body: body,
       );
-      debugPrint("Immediate OneSignal Response: ${response.body}");
+
+      debugPrint("OneSignal Response (Basic): ${response.statusCode}");
+
+      // If Basic fails with 400/403, try Key style
+      if (response.statusCode != 200) {
+        debugPrint("Basic Auth failed. Retrying with 'Key' prefix...");
+        response = await http.post(
+          url,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": "Key $cleanKey",
+          },
+          body: body,
+        );
+        debugPrint("OneSignal Response (Key): ${response.statusCode}");
+      }
+
+      debugPrint("Final Body: ${response.body}");
+
+      if (response.statusCode != 200) {
+        throw "OneSignal API Error: ${response.statusCode} - ${response.body}";
+      }
+
+      final responseJson = jsonDecode(response.body);
+      if (responseJson['errors'] != null) {
+        throw "OneSignal Error: ${responseJson['errors']}";
+      }
     } catch (e) {
       debugPrint("Immediate OneSignal Error: $e");
+      rethrow; // Allow UI to handle and show error
     }
   }
 }
