@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'database_service.dart';
 import '../models/user_model.dart';
 import 'package:flutter/foundation.dart';
+import '../services/notification_service.dart';
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -21,6 +22,7 @@ class AuthService with ChangeNotifier {
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) {
       _currentUser = null;
+      NotificationService().logout(); // Ensure OneSignal logs out too
     } else {
       final role = await _db.getUserRole(firebaseUser.uid);
       _currentUser = UserModel(
@@ -28,6 +30,8 @@ class AuthService with ChangeNotifier {
         email: firebaseUser.email ?? '',
         role: role,
       );
+      // Ensure OneSignal logs in when Firebase auth changes
+      NotificationService().handleLogin(firebaseUser);
     }
     _isLoading = false;
     notifyListeners();

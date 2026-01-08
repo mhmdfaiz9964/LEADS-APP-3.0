@@ -92,6 +92,23 @@ class NotificationService {
     await _initOneSignal();
   }
 
+  Future<void> handleLogin(User user) async {
+    OneSignal.login(user.email!);
+    try {
+      final role = await DatabaseService().getUserRole(user.uid);
+      OneSignal.User.addTagWithKey('role', role);
+
+      // Force refresh of subscription
+      OneSignal.User.pushSubscription.optIn();
+    } catch (e) {
+      debugPrint("Error setting OneSignal tags: $e");
+    }
+  }
+
+  Future<void> logout() async {
+    OneSignal.logout();
+  }
+
   Future<void> _initOneSignal() async {
     // NOTE: Replace with your actual OneSignal App ID
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -103,30 +120,7 @@ class NotificationService {
     // Prompt user for external ID (link OneSignal ID with user email)
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && user.email != null) {
-      await OneSignal.login(user.email!);
-
-      // Set user role tag (Admin/User) to target push notifications
-      try {
-        final role = await DatabaseService().getUserRole(user.uid);
-        OneSignal.User.addTagWithKey('role', role);
-        debugPrint("OneSignal Tag Set: role=$role");
-
-        // Force Opt-In in case the SDK is in a 'soft' unsubscribe state
-        OneSignal.User.pushSubscription.optIn();
-
-        // Log subscription status for debugging
-        final subscriptionId = OneSignal.User.pushSubscription.id;
-        final isOptedIn = OneSignal.User.pushSubscription.optedIn;
-        final token = OneSignal.User.pushSubscription.token;
-
-        debugPrint("OneSignal Subscription ID: $subscriptionId");
-        debugPrint("OneSignal Is Opted In: $isOptedIn");
-        debugPrint(
-          "OneSignal Push Token: ${token != null ? 'Exists' : 'NULL'}",
-        );
-      } catch (e) {
-        debugPrint("Error setting OneSignal role tag: $e");
-      }
+      await handleLogin(user);
     }
   }
 
