@@ -2,34 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryBlue = Color(0xFF0046FF);
-  static const Color appBarBlue = Color(0xFF0046FF);
-  static const Color lightBlue = Color(0xFF73C8D2);
-  static const Color secondaryOrange = Color(0xFFFF9013);
-  static const Color backgroundBeige = Colors.white;
-  static const Color textGrey = Color(0xFF666666);
-  static const Color iconGrey = Color(0xFF9E9E9E);
-  static const Color iconBgOrange = Color(0xFFA57C36);
-  static const Color labelBlue = Color(0xFF34B3E4);
+  // New Color Palette
+  static const Color palette1 = Color(0xFFF3EEEA); // Lightest - Accent/Surface
+  static const Color palette2 = Color(
+    0xFFEBE3D5,
+  ); // Light Beige - Secondary Surface
+  static const Color palette3 = Color(
+    0xFFB0A695,
+  ); // Medium Brown - Secondary/Icons
+  static const Color palette4 = Color(0xFF776B5D); // Dark Brown - Primary/Text
+
+  // Mapping
+  static const Color primaryBlue = palette4;
+  static const Color appBarBlue = palette4; // App Bar Background
+  static const Color lightBlue = palette3;
+  static const Color secondaryOrange = palette3; // Accent
+  static const Color backgroundBeige =
+      Colors.white; // User requested pure white
+  static const Color textGrey = palette4;
+  static const Color iconGrey = palette3;
+  static const Color iconBgOrange = palette2;
+  static const Color labelBlue = palette3;
   static const Color reminderRed = Color(0xFFC60808);
   static const Color proposalGreen = Color(0xFF89C103);
   static const Color noteOrange = Color(0xFFFFB13C);
 
-  static TextStyle get textStyle =>
-      GoogleFonts.roboto(); // Roboto seems closer to the screenshot
+  static TextStyle get textStyle => GoogleFonts.roboto();
 
   static ThemeData get theme {
     return ThemeData(
       primaryColor: primaryBlue,
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: Colors.white, // Pure white background
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryBlue,
         secondary: secondaryOrange,
-        surface: Colors.white,
+        surface: Colors.white, // Pure white surface
+        background: Colors.white,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: appBarBlue,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.white, // White text on Dark Brown
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
@@ -54,12 +66,10 @@ class AppTheme {
       ),
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,
-        fillColor: Colors.transparent,
-        border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFFE0E0E0)),
-        ),
+        fillColor: palette1, // Using lightest palette for input background
+        border: UnderlineInputBorder(borderSide: BorderSide(color: palette3)),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFFE0E0E0)),
+          borderSide: BorderSide(color: palette3),
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: primaryBlue, width: 2),
@@ -74,24 +84,24 @@ class AppTheme {
           fontSize: 16,
           fontFamily: 'Roboto',
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 8),
+        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       ),
       textTheme: GoogleFonts.robotoTextTheme().copyWith(
         titleLarge: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: palette4, // Dark brown title
         ),
-        bodyLarge: const TextStyle(fontSize: 15, color: Colors.black87),
-        bodyMedium: const TextStyle(fontSize: 14, color: Colors.black54),
+        bodyLarge: const TextStyle(fontSize: 15, color: palette4),
+        bodyMedium: const TextStyle(fontSize: 14, color: palette4),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 0,
+        color: Colors.white, // White cards
+        elevation: 2,
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
-          side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          side: BorderSide(color: palette3.withOpacity(0.2)),
         ),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(

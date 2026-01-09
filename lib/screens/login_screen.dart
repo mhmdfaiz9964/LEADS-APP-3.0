@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white, // Removed to use theme background
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -160,14 +160,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   "ADMINISTRATOR",
                   "admin@selfholidays.com",
                   "admin123",
-                  Colors.blue,
+                  AppTheme.primaryBlue,
                 ),
                 const SizedBox(height: 12),
                 _buildDemoTile(
                   "STANDARD USER",
                   "user@selfholidays.com",
                   "user123",
-                  Colors.orange,
+                  AppTheme.secondaryOrange,
                 ),
               ],
             ),

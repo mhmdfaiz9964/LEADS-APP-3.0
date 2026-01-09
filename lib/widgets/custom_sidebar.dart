@@ -330,7 +330,7 @@ class CustomSidebar extends StatelessWidget {
         title,
         style: AppTheme.textStyle.copyWith(
           fontWeight: FontWeight.w500,
-          color: color ?? Colors.black87,
+          color: color ?? AppTheme.textGrey,
         ),
       ),
       onTap: onTap,
@@ -358,7 +358,7 @@ class CustomSidebar extends StatelessWidget {
         title,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
-          color: Colors.black87,
+          color: AppTheme.textGrey,
           fontSize: 14,
         ),
       ),

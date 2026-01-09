@@ -171,7 +171,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white, // Removed to use theme background
       appBar: AppBar(
         backgroundColor: AppTheme.appBarBlue,
         title: const Text(

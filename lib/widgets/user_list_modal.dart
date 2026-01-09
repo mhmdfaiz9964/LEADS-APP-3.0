@@ -142,8 +142,8 @@ class UserListModal extends StatelessWidget {
                                 ),
                                 decoration: BoxDecoration(
                                   color: role == 'Admin'
-                                      ? Colors.red.withOpacity(0.1)
-                                      : Colors.blue.withOpacity(0.1),
+                                      ? AppTheme.reminderRed.withOpacity(0.1)
+                                      : AppTheme.labelBlue.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -152,8 +152,8 @@ class UserListModal extends StatelessWidget {
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                     color: role == 'Admin'
-                                        ? Colors.red
-                                        : Colors.blue,
+                                        ? AppTheme.reminderRed
+                                        : AppTheme.labelBlue,
                                   ),
                                 ),
                               ),

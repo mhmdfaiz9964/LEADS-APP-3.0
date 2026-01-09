@@ -17,7 +17,7 @@ class CustomBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
       ),
       child: SafeArea(
@@ -40,7 +40,7 @@ class CustomBottomNav extends StatelessWidget {
 
   Widget _buildNavItem(int index, String label, IconData icon) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? AppTheme.primaryBlue : Colors.grey;
+    final color = isSelected ? AppTheme.primaryBlue : AppTheme.iconGrey;
     final showBadge = index == 3 && remindersBadgeCount > 0;
 
     return GestureDetector(
@@ -62,7 +62,7 @@ class CustomBottomNav extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: AppTheme.reminderRed,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       constraints: const BoxConstraints(
