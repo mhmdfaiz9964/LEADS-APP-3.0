@@ -193,31 +193,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 },
               ),
               const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "CANCEL",
-                      style: TextStyle(
-                        color: AppTheme.secondaryOrange,
-                        fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "CANCEL",
+                        style: TextStyle(
+                          color: AppTheme.secondaryOrange,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: _isLoading ? null : _saveService,
-                    child: const Text(
-                      "OK",
-                      style: TextStyle(
-                        color: AppTheme.secondaryOrange,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: _isLoading ? null : _saveService,
+                      child: const Text(
+                        "OK",
+                        style: TextStyle(
+                          color: AppTheme.secondaryOrange,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

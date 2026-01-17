@@ -133,27 +133,38 @@ class _SelectCustomerServicesScreenState
                   },
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await FirebaseFirestore.instance
-                        .collection('booking_customers')
-                        .doc(widget.customer.id)
-                        .update({
-                          'serviceIds': _selectedServiceIds.toList(),
-                          'labelIds': _selectedServiceIds.toList(),
-                        });
-                    if (mounted) Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryOrange,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+              SafeArea(
+                top: false,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection('booking_customers')
+                          .doc(widget.customer.id)
+                          .update({
+                            'serviceIds': _selectedServiceIds.toList(),
+                            'labelIds': _selectedServiceIds.toList(),
+                          });
+                      if (mounted) Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryOrange,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "OK",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                      ),
+                    ),
                   ),
                 ),
               ),

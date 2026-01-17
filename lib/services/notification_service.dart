@@ -198,6 +198,8 @@ class NotificationService {
                 channelDescription: 'Notifications for lead tasks',
                 importance: Importance.max,
                 priority: Priority.high,
+                playSound: true,
+                enableVibration: true,
               ),
             ),
             androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -224,8 +226,8 @@ class NotificationService {
     required DateTime scheduledTime,
     required String creatorEmail,
   }) async {
-    // Schedule push 3 minutes before the reminder
-    final sendAt = scheduledTime.subtract(const Duration(minutes: 3));
+    // Schedule push exactly at the reminder time
+    final sendAt = scheduledTime;
     if (sendAt.isBefore(DateTime.now())) return;
 
     final url = Uri.parse('https://onesignal.com/api/v1/notifications');
@@ -235,8 +237,8 @@ class NotificationService {
     // Targets: The user who added the reminder and anyone with tag 'role': 'Admin'
     final body = jsonEncode({
       "app_id": appId,
-      "headings": {"en": "Reminder Incoming!"},
-      "contents": {"en": "$title: $message (Due in 3 mins)"},
+      "headings": {"en": "Task Reminder!"},
+      "contents": {"en": "$title: $message (Due Now)"},
       "send_after":
           sendAt
               .toUtc()

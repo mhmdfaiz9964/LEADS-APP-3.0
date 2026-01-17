@@ -264,7 +264,7 @@ class _MainScreenState extends State<MainScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.sort_rounded),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
         title: Text(

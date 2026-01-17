@@ -55,7 +55,7 @@ class CustomSidebar extends StatelessWidget {
                       radius: 30,
                       backgroundColor: Colors.white,
                       child: Icon(
-                        Icons.person,
+                        Icons.account_circle_rounded,
                         color: AppTheme.primaryBlue,
                         size: 36,
                       ),
@@ -121,16 +121,21 @@ class CustomSidebar extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Navigation Items for ALL roles
-                _buildSidebarItem(context, 'Leads', Icons.track_changes, () {
-                  if (onIndexChanged != null) {
-                    Navigator.pop(context);
-                    onIndexChanged!(0);
-                  }
-                }),
+                _buildSidebarItem(
+                  context,
+                  'Leads',
+                  Icons.ads_click_rounded,
+                  () {
+                    if (onIndexChanged != null) {
+                      Navigator.pop(context);
+                      onIndexChanged!(0);
+                    }
+                  },
+                ),
                 _buildSidebarItem(
                   context,
                   'Customers',
-                  Icons.person_pin_circle,
+                  Icons.person_rounded,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -141,7 +146,7 @@ class CustomSidebar extends StatelessWidget {
                 _buildSidebarItem(
                   context,
                   'Services',
-                  Icons.miscellaneous_services,
+                  Icons.layers_rounded,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -152,7 +157,7 @@ class CustomSidebar extends StatelessWidget {
                 _buildSidebarItem(
                   context,
                   'Reminders',
-                  Icons.notifications_none,
+                  Icons.notifications_active_rounded,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -179,8 +184,8 @@ class CustomSidebar extends StatelessWidget {
                 _buildStatusFilterItem(
                   context,
                   'All Orders',
-                  Icons.apps,
-                  Colors.grey[700]!,
+                  Icons.layers_rounded,
+                  Colors.blue,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -191,8 +196,8 @@ class CustomSidebar extends StatelessWidget {
                 _buildStatusFilterItem(
                   context,
                   'New',
-                  Icons.shopping_cart,
-                  Colors.blue,
+                  Icons.note_add_rounded,
+                  Colors.purple,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -203,8 +208,8 @@ class CustomSidebar extends StatelessWidget {
                 _buildStatusFilterItem(
                   context,
                   'Process',
-                  Icons.check_circle,
-                  Colors.green,
+                  Icons.pending_outlined,
+                  Colors.orange,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -215,8 +220,8 @@ class CustomSidebar extends StatelessWidget {
                 _buildStatusFilterItem(
                   context,
                   'Approved',
-                  Icons.inventory,
-                  Colors.orange,
+                  Icons.check_circle_rounded,
+                  Colors.green,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);
@@ -227,8 +232,8 @@ class CustomSidebar extends StatelessWidget {
                 _buildStatusFilterItem(
                   context,
                   'Refused',
-                  Icons.local_shipping,
-                  Colors.purple,
+                  Icons.cancel_rounded,
+                  Colors.red,
                   () {
                     if (onIndexChanged != null) {
                       Navigator.pop(context);

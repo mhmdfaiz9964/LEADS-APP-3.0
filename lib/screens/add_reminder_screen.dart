@@ -88,9 +88,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryBlue,
-            ),
+            colorScheme: const ColorScheme.light(primary: AppTheme.primaryBlue),
           ),
           child: child!,
         );
@@ -253,28 +251,39 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _saveReminder,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryOrange,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 24,
+                top: 8,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _saveReminder,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryOrange,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 14,
+                      ),
                     ),
+                    child: _isLoading
+                        ? const CupertinoActivityIndicator(color: Colors.white)
+                        : const Text(
+                            "OK",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                   ),
-                  child: _isLoading
-                      ? const CupertinoActivityIndicator(color: Colors.white)
-                      : const Text(
-                          "OK",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

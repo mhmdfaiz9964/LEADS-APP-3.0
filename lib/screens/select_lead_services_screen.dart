@@ -132,27 +132,42 @@ class _SelectLeadServicesScreenState extends State<SelectLeadServicesScreen> {
                   },
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await FirebaseFirestore.instance
-                        .collection('booking_leads')
-                        .doc(widget.lead.id)
-                        .update({
-                          'serviceIds': _selectedServiceIds.toList(),
-                          'labelIds': _selectedServiceIds.toList(),
-                        });
-                    if (mounted) Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryOrange,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+              SafeArea(
+                top: false,
+                child: Container(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 30,
+                    top: 8,
                   ),
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection('booking_leads')
+                          .doc(widget.lead.id)
+                          .update({
+                            'serviceIds': _selectedServiceIds.toList(),
+                            'labelIds': _selectedServiceIds.toList(),
+                          });
+                      if (mounted) Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.secondaryOrange,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      "OK",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                      ),
+                    ),
                   ),
                 ),
               ),
