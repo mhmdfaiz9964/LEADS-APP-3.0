@@ -300,6 +300,8 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                 hintText: hint,
                 hintStyle: const TextStyle(color: Colors.grey, fontSize: 18),
                 contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                filled: true,
+                fillColor: Colors.white,
               ),
             ),
           ),

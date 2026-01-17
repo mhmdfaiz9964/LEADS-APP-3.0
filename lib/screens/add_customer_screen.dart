@@ -287,6 +287,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                 hintText: hint,
                 hintStyle: const TextStyle(color: Colors.grey, fontSize: 18),
                 contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                filled: true,
+                fillColor: Colors.white,
               ),
             ),
           ),
@@ -323,6 +325,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   decoration: const InputDecoration(
                     hintText: "Select Service",
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                   items: services.map((l) {
                     return DropdownMenuItem(
