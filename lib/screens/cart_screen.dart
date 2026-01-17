@@ -49,29 +49,29 @@ class _CartScreenState extends State<CartScreen> {
               ctx,
               order,
               "NEW",
-              Icons.shopping_cart,
-              Colors.blue,
+              Icons.note_add_rounded,
+              Colors.purple,
             ),
             _buildStatusOption(
               ctx,
               order,
               "PROCESS",
-              Icons.check_circle,
-              Colors.green,
-            ),
-            _buildStatusOption(
-              ctx,
-              order,
-              "APPROVED",
-              Icons.inventory,
+              Icons.pending_outlined,
               Colors.orange,
             ),
             _buildStatusOption(
               ctx,
               order,
+              "APPROVED",
+              Icons.check_circle_rounded,
+              Colors.green,
+            ),
+            _buildStatusOption(
+              ctx,
+              order,
               "REFUSED",
-              Icons.local_shipping,
-              Colors.purple,
+              Icons.cancel_rounded,
+              Colors.red,
             ),
           ],
         ),
@@ -99,32 +99,39 @@ class _CartScreenState extends State<CartScreen> {
         if (ctx.mounted) Navigator.pop(ctx);
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? color.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected ? color.withOpacity(0.05) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : Colors.grey.withOpacity(0.3),
+            color: isSelected ? color : Colors.grey.withOpacity(0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 24),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 status,
                 style: TextStyle(
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? color : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? color : AppTheme.textGrey,
+                  fontSize: 15,
                 ),
               ),
             ),
-            if (isSelected) Icon(Icons.check, color: color, size: 20),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: color, size: 20),
           ],
         ),
       ),
@@ -160,32 +167,32 @@ class _CartScreenState extends State<CartScreen> {
                 _buildStatusFilterChip(
                   "ALL",
                   "ALL",
-                  Icons.apps,
-                  AppTheme.appBarBlue,
-                ),
-                _buildStatusFilterChip(
-                  "NEW",
-                  "NEW",
-                  Icons.shopping_cart,
+                  Icons.layers_rounded,
                   Colors.blue,
                 ),
                 _buildStatusFilterChip(
-                  "PROCESS",
-                  "PROCESS",
-                  Icons.check_circle,
-                  Colors.green,
+                  "NEW",
+                  "NEW",
+                  Icons.note_add_rounded,
+                  Colors.purple,
                 ),
                 _buildStatusFilterChip(
-                  "APPROVED",
-                  "APPROVED",
-                  Icons.inventory,
+                  "PROCESS",
+                  "PROCESS",
+                  Icons.pending_outlined,
                   Colors.orange,
                 ),
                 _buildStatusFilterChip(
+                  "APPROVED",
+                  "APPROVED",
+                  Icons.check_circle_rounded,
+                  Colors.green,
+                ),
+                _buildStatusFilterChip(
                   "REFUSED",
                   "REFUSED",
-                  Icons.local_shipping,
-                  Colors.purple,
+                  Icons.cancel_rounded,
+                  Colors.red,
                 ),
               ],
             ),
@@ -238,25 +245,51 @@ class _CartScreenState extends State<CartScreen> {
     bool isSelected = _selectedStatusFilter == status;
     return GestureDetector(
       onTap: () => setState(() => _selectedStatusFilter = status),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color : color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color, width: isSelected ? 2 : 1),
+          color: isSelected ? color : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.withOpacity(0.2),
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: isSelected ? Colors.white : color, size: 18),
-            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Colors.white.withOpacity(0.2)
+                    : color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? Colors.white : color,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : color,
+                color: isSelected ? Colors.white : AppTheme.textGrey,
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
               ),
             ),
           ],
@@ -275,10 +308,10 @@ class _OrderListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor = Colors.grey;
-    if (order.status == 'NEW') statusColor = Colors.blue;
-    if (order.status == 'PROCESS') statusColor = Colors.green;
-    if (order.status == 'APPROVED') statusColor = Colors.orange;
-    if (order.status == 'REFUSED') statusColor = Colors.purple;
+    if (order.status == 'NEW') statusColor = Colors.purple;
+    if (order.status == 'PROCESS') statusColor = Colors.orange;
+    if (order.status == 'APPROVED') statusColor = Colors.green;
+    if (order.status == 'REFUSED') statusColor = Colors.red;
 
     return Card(
       elevation: 0,

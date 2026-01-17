@@ -32,7 +32,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.add, color: Colors.orange, size: 48),
+                Icon(Icons.add, color: AppTheme.secondaryOrange, size: 48),
                 const SizedBox(width: 16),
                 const Expanded(
                   child: Text(
@@ -47,7 +47,10 @@ class _LeadsScreenState extends State<LeadsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("CANCEL", style: TextStyle(color: Colors.orange)),
+            child: const Text(
+              "CANCEL",
+              style: TextStyle(color: AppTheme.secondaryOrange),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -61,7 +64,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
             },
             child: const Text(
               "MOVE TO CUSTOMERS LIST",
-              style: TextStyle(color: Colors.orange),
+              style: TextStyle(color: AppTheme.secondaryOrange),
             ),
           ),
         ],
@@ -334,7 +337,7 @@ class _LeadCardState extends State<LeadCard> {
                 children: [
                   const Icon(
                     Icons.track_changes,
-                    color: Color(0xFF0046FF),
+                    color: AppTheme.primaryBlue,
                     size: 36,
                   ),
                   const SizedBox(width: 12),
@@ -376,13 +379,15 @@ class _LeadCardState extends State<LeadCard> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.orange.withOpacity(0.5),
+                                  color: AppTheme.secondaryOrange.withOpacity(
+                                    0.5,
+                                  ),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.more_horiz,
                                 size: 16,
-                                color: Colors.orange,
+                                color: AppTheme.secondaryOrange,
                               ),
                             ),
                           ),
@@ -441,7 +446,7 @@ class _LeadCardState extends State<LeadCard> {
                       _buildInlineAction(
                         Icons.visibility_off_outlined,
                         "Hide",
-                        Colors.orange,
+                        AppTheme.secondaryOrange,
                         () {},
                       ),
                       _buildInlineAction(

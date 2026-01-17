@@ -71,7 +71,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
               if (!snapshot.hasData || snapshot.data!.isEmpty)
                 return const Center(child: Text("No services found"));
 
-              var services = snapshot.data!;
+              var services = List<ServiceModel>.from(snapshot.data!);
               if (widget.searchQuery.isNotEmpty) {
                 final query = widget.searchQuery.toLowerCase();
                 services = services
@@ -79,12 +79,24 @@ class _ServicesScreenState extends State<ServicesScreen> {
                     .toList();
               }
 
-              return ListView.builder(
+              return ReorderableListView.builder(
                 padding: const EdgeInsets.fromLTRB(8, 4, 8, 100),
                 itemCount: services.length,
+                onReorder: isAdmin
+                    ? (oldIndex, newIndex) async {
+                        if (newIndex > oldIndex) {
+                          newIndex -= 1;
+                        }
+                        final item = services.removeAt(oldIndex);
+                        services.insert(newIndex, item);
+                        await DatabaseService().updateServiceOrder(services);
+                      }
+                    : (oldIndex, newIndex) {},
+                buildDefaultDragHandles: false,
                 itemBuilder: (context, index) {
                   final service = services[index];
                   return StreamBuilder<int>(
+                    key: ValueKey(service.id),
                     stream: DatabaseService().getLeadsCountByService(
                       service.id,
                       filterEmail: filterEmail,
@@ -99,6 +111,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                         builder: (context, customersSnapshot) {
                           final customersCount = customersSnapshot.data ?? 0;
                           return ServiceCard(
+                            index: index,
                             service: service,
                             count: leadsCount + customersCount,
                             onDelete: () => _confirmDelete(context, service),
@@ -119,12 +132,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
 }
 
 class ServiceCard extends StatefulWidget {
+  final int index;
   final ServiceModel service;
   final int count;
   final VoidCallback onDelete;
   final bool isAdmin;
   const ServiceCard({
     super.key,
+    required this.index,
     required this.service,
     required this.count,
     required this.onDelete,
@@ -214,6 +229,18 @@ class _ServiceCardState extends State<ServiceCard> {
             children: [
               Row(
                 children: [
+                  if (widget.isAdmin)
+                    ReorderableDragStartListener(
+                      index: widget.index,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8, left: 4),
+                        child: Icon(
+                          Icons.drag_indicator,
+                          color: Colors.grey[400],
+                          size: 24,
+                        ),
+                      ),
+                    ),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,

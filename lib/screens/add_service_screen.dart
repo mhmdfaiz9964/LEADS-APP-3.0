@@ -81,11 +81,19 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       return;
     }
 
+    int order = widget.serviceToEdit?.order ?? 0;
+    if (widget.serviceToEdit == null) {
+      // Get the current max order to place new service at the end
+      final existingServices = await DatabaseService().getServices().first;
+      order = existingServices.length;
+    }
+
     final service = ServiceModel(
       id: widget.serviceToEdit?.id ?? '',
       name: _nameController.text.toUpperCase(),
       colorValue: _selectedColor.value,
       creatorEmail: widget.serviceToEdit?.creatorEmail ?? userEmail,
+      order: order,
     );
 
     try {

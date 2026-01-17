@@ -3,14 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // New Color Palette
-  static const Color palette1 = Color(0xFFF3EEEA); // Lightest - Accent/Surface
+  static const Color palette1 = Color(0xFFF1F3F5); // Lightest - Accent/Surface
   static const Color palette2 = Color(
-    0xFFEBE3D5,
-  ); // Light Beige - Secondary Surface
+    0xFFD1D7DD,
+  ); // Light Slate - Secondary Surface
   static const Color palette3 = Color(
-    0xFFB0A695,
-  ); // Medium Brown - Secondary/Icons
-  static const Color palette4 = Color(0xFF776B5D); // Dark Brown - Primary/Text
+    0xFF82919E,
+  ); // Medium Slate - Secondary/Icons
+  static const Color palette4 = Color(0xFF556370); // Slate Blue - Primary/Text
 
   // Mapping
   static const Color primaryBlue = palette4;
@@ -41,7 +41,7 @@ class AppTheme {
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: appBarBlue,
-        foregroundColor: Colors.white, // White text on Dark Brown
+        foregroundColor: Colors.white, // White text on Slate Blue
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
@@ -90,7 +90,7 @@ class AppTheme {
         titleLarge: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: palette4, // Dark brown title
+          color: palette4, // Slate blue title
         ),
         bodyLarge: const TextStyle(fontSize: 15, color: palette4),
         bodyMedium: const TextStyle(fontSize: 14, color: palette4),

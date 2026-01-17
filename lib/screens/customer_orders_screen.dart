@@ -85,10 +85,10 @@ class OrderCard extends StatelessWidget {
         title: const Text("Update Status"),
         content: const Text("Select new status for this order."),
         actions: [
-          _buildStatusAction(ctx, "NEW", Colors.blue),
-          _buildStatusAction(ctx, "PROCESS", Colors.green),
-          _buildStatusAction(ctx, "APPROVED", Colors.orange),
-          _buildStatusAction(ctx, "REFUSED", Colors.purple),
+          _buildStatusAction(ctx, "NEW", Colors.purple),
+          _buildStatusAction(ctx, "PROCESS", Colors.orange),
+          _buildStatusAction(ctx, "APPROVED", Colors.green),
+          _buildStatusAction(ctx, "REFUSED", Colors.red),
           CupertinoDialogAction(
             child: const Text("Cancel"),
             onPressed: () => Navigator.pop(ctx),
@@ -119,10 +119,10 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor = Colors.grey;
-    if (order.status == 'NEW') statusColor = Colors.blue;
-    if (order.status == 'PROCESS') statusColor = Colors.green;
-    if (order.status == 'APPROVED') statusColor = Colors.orange;
-    if (order.status == 'REFUSED') statusColor = Colors.purple;
+    if (order.status == 'NEW') statusColor = Colors.purple;
+    if (order.status == 'PROCESS') statusColor = Colors.orange;
+    if (order.status == 'APPROVED') statusColor = Colors.green;
+    if (order.status == 'REFUSED') statusColor = Colors.red;
 
     return GestureDetector(
       onLongPress: () => _showStatusDialog(context),

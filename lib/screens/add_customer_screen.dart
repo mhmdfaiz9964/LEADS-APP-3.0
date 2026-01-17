@@ -162,6 +162,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildField(Icons.person, "Customer Name", _nameController),
+                _buildField(Icons.phone, "Phone Number", _phoneController),
+                _buildServiceDropdown(),
+                _buildField(Icons.notes, "Additional Notes", _notesController),
                 _buildField(
                   Icons.person_outline,
                   "Agent Name",
@@ -171,6 +174,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   Icons.assignment_ind_outlined,
                   "Passport Number",
                   _passportNumberController,
+                ),
+                _buildField(
+                  Icons.location_on,
+                  "Office Address",
+                  _addressController,
                 ),
                 GestureDetector(
                   onTap: () async {
@@ -197,19 +205,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                     ),
                   ),
                 ),
-                _buildField(Icons.phone, "Phone Number", _phoneController),
                 _buildField(
                   Icons.alternate_email,
                   "Email Address",
                   _emailController,
                 ),
-                _buildField(
-                  Icons.location_on,
-                  "Office Address",
-                  _addressController,
-                ),
-                _buildField(Icons.notes, "Additional Notes", _notesController),
-                _buildServiceDropdown(),
               ],
             ),
           ),
@@ -278,7 +278,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF0046FF), size: 28),
+          Icon(icon, color: AppTheme.primaryBlue, size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(
@@ -302,11 +302,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          const Icon(
-            Icons.miscellaneous_services_outlined,
-            color: Color(0xFF0046FF),
-            size: 28,
-          ),
+          const Icon(Icons.settings, color: AppTheme.primaryBlue, size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: StreamBuilder<List<ServiceModel>>(
@@ -316,14 +312,13 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   return const Text("Error loading services");
                 if (!snapshot.hasData) return const SizedBox.shrink();
                 final services = snapshot.data!;
-                if (services.isEmpty)
-                  return const Text("No services found. Create one first.");
+                if (services.isEmpty) return const Text("No services found.");
                 return DropdownButtonFormField<String>(
                   value: (services.any((l) => l.id == _selectedServiceId))
                       ? _selectedServiceId
                       : null,
                   decoration: const InputDecoration(
-                    hintText: "Select Service",
+                    hintText: "Classification",
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
                     filled: true,
                     fillColor: Colors.white,

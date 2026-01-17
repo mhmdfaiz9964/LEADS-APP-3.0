@@ -26,15 +26,20 @@ class NotificationsScreen extends StatelessWidget {
             onPressed: () {
               DatabaseService().clearAllNotifications(filterEmail: filterEmail);
             },
-            child: const Text("Clear All", style: TextStyle(color: Colors.white70)),
+            child: const Text(
+              "Clear All",
+              style: TextStyle(color: Colors.white70),
+            ),
           ),
         ],
       ),
       body: StreamBuilder<List<AppNotification>>(
         stream: DatabaseService().getNotifications(filterEmail: filterEmail),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text("No notifications yet"));
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData || snapshot.data!.isEmpty)
+            return const Center(child: Text("No notifications yet"));
 
           final notifications = snapshot.data!;
           return ListView.builder(
@@ -54,7 +59,7 @@ class NotificationsScreen extends StatelessWidget {
 
     return Card(
       elevation: 0,
-       margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
         side: BorderSide(color: Colors.grey.withOpacity(0.2)),
@@ -62,20 +67,30 @@ class NotificationsScreen extends StatelessWidget {
       child: ListTile(
         onTap: () => DatabaseService().markNotificationRead(n.id),
         leading: Icon(
-          n.type == 'LEAD' ? Icons.track_changes : (n.type == 'CUSTOMER' ? Icons.person : Icons.notifications),
-          color: const Color(0xFF0046FF),
+          n.type == 'LEAD'
+              ? Icons.track_changes
+              : (n.type == 'CUSTOMER' ? Icons.person : Icons.notifications),
+          color: AppTheme.primaryBlue,
           size: 28,
         ),
-        title: Text(n.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          n.title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(n.message, style: TextStyle(color: Colors.grey[700])),
             const SizedBox(height: 4),
-            Text(timeStr, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            Text(
+              timeStr,
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
+            ),
           ],
         ),
-        trailing: !n.isRead ? const Icon(Icons.circle, color: AppTheme.secondaryOrange, size: 8) : null,
+        trailing: !n.isRead
+            ? const Icon(Icons.circle, color: AppTheme.secondaryOrange, size: 8)
+            : null,
       ),
     );
   }

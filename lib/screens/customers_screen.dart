@@ -376,7 +376,11 @@ class _CustomerCardState extends State<CustomerCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.person, color: Color(0xFF0046FF), size: 36),
+                  const Icon(
+                    Icons.person,
+                    color: AppTheme.primaryBlue,
+                    size: 36,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -416,13 +420,15 @@ class _CustomerCardState extends State<CustomerCard> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.orange.withOpacity(0.5),
+                                  color: AppTheme.secondaryOrange.withOpacity(
+                                    0.5,
+                                  ),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.more_horiz,
                                 size: 16,
-                                color: Colors.orange,
+                                color: AppTheme.secondaryOrange,
                               ),
                             ),
                           ),
@@ -491,7 +497,7 @@ class _CustomerCardState extends State<CustomerCard> {
                       _buildInlineAction(
                         Icons.visibility_off_outlined,
                         "Hide",
-                        Colors.orange,
+                        AppTheme.secondaryOrange,
                         () {},
                       ),
                       _buildInlineAction(

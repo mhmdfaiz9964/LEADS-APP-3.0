@@ -300,7 +300,7 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF0046FF), size: 28),
+          Icon(icon, color: AppTheme.primaryBlue, size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: TextField(

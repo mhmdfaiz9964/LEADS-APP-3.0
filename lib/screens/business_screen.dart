@@ -216,7 +216,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
     VoidCallback? onTap,
   ) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF0046FF), size: 28),
+      leading: Icon(icon, color: AppTheme.primaryBlue, size: 28),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(
         subtitle,

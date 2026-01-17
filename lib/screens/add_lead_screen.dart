@@ -164,6 +164,15 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 _buildField(Icons.person, "Lead Name", _nameController),
+                _buildField(Icons.phone, "Phone Number", _phoneController),
+                _buildServicePicker(),
+                const SizedBox(height: 16),
+                _buildField(
+                  Icons.notes,
+                  "Notes",
+                  _notesController,
+                  maxLines: 3,
+                ),
                 _buildField(
                   Icons.person_outline,
                   "Agent Name",
@@ -174,6 +183,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   "Passport Number",
                   _passportNumberController,
                 ),
+                _buildField(Icons.location_on, "Address", _addressController),
                 GestureDetector(
                   onTap: () async {
                     final date = await showDatePicker(
@@ -199,25 +209,11 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                     ),
                   ),
                 ),
-                _buildField(Icons.phone, "Phone Number", _phoneController),
                 _buildField(
                   Icons.alternate_email,
                   "Email Address",
                   _emailController,
                 ),
-                _buildField(Icons.location_on, "Address", _addressController),
-                _buildField(
-                  Icons.notes,
-                  "Notes",
-                  _notesController,
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  "Classification",
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-                _buildServicePicker(),
               ],
             ),
           ),
@@ -311,44 +307,52 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
   }
 
   Widget _buildServicePicker() {
-    return StreamBuilder<List<ServiceModel>>(
-      stream: DatabaseService()
-          .getServices(), // Show all labels or filter as needed
-      builder: (context, snapshot) {
-        if (snapshot.hasError) return const Text("Error loading services");
-        if (!snapshot.hasData) return const SizedBox();
-        final services = snapshot.data!;
-        if (services.isEmpty)
-          return const Text("No services found. Create services first.");
-        return Container(
-          margin: const EdgeInsets.only(top: 8),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: (services.any((l) => l.id == _selectedServiceId))
-                  ? _selectedServiceId
-                  : null,
-              isExpanded: true,
-              hint: const Text(
-                "Select Service",
-                style: TextStyle(color: Colors.grey, fontSize: 18),
-              ),
-              items: services.map((l) {
-                return DropdownMenuItem(
-                  value: l.id,
-                  child: Row(
-                    children: [
-                      Icon(Icons.circle, color: l.color, size: 12),
-                      const SizedBox(width: 12),
-                      Text(l.name, style: const TextStyle(fontSize: 16)),
-                    ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          const Icon(Icons.settings, color: AppTheme.primaryBlue, size: 28),
+          const SizedBox(width: 16),
+          Expanded(
+            child: StreamBuilder<List<ServiceModel>>(
+              stream: DatabaseService().getServices(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError)
+                  return const Text("Error loading services");
+                if (!snapshot.hasData) return const SizedBox();
+                final services = snapshot.data!;
+                if (services.isEmpty) return const Text("No services found.");
+                return DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: (services.any((l) => l.id == _selectedServiceId))
+                        ? _selectedServiceId
+                        : null,
+                    isExpanded: true,
+                    hint: const Text(
+                      "Classification",
+                      style: TextStyle(color: Colors.grey, fontSize: 18),
+                    ),
+                    items: services.map((l) {
+                      return DropdownMenuItem(
+                        value: l.id,
+                        child: Row(
+                          children: [
+                            Icon(Icons.circle, color: l.color, size: 12),
+                            const SizedBox(width: 12),
+                            Text(l.name, style: const TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) =>
+                        setState(() => _selectedServiceId = val),
                   ),
                 );
-              }).toList(),
-              onChanged: (val) => setState(() => _selectedServiceId = val),
+              },
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

@@ -226,7 +226,7 @@ class DatabaseService {
 
   // --- SERVICES ---
   Stream<List<ServiceModel>> getServices({String? filterEmail}) {
-    Query query = _db.collection('booking_services');
+    Query query = _db.collection('booking_services').orderBy('order');
     if (filterEmail != null) {
       query = query.where('creatorEmail', isEqualTo: filterEmail);
     }
@@ -249,6 +249,15 @@ class DatabaseService {
 
   Future<void> deleteService(String id) {
     return _db.collection('booking_services').doc(id).delete();
+  }
+
+  Future<void> updateServiceOrder(List<ServiceModel> services) async {
+    final batch = _db.batch();
+    for (int i = 0; i < services.length; i++) {
+      final docRef = _db.collection('booking_services').doc(services[i].id);
+      batch.update(docRef, {'order': i});
+    }
+    return batch.commit();
   }
 
   // --- REMINDERS ---

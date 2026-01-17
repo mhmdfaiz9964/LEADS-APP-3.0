@@ -128,7 +128,7 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
                 ),
                 leading: const Icon(
                   Icons.track_changes,
-                  color: Color(0xFF0046FF),
+                  color: AppTheme.primaryBlue,
                   size: 36,
                 ),
                 title: Text(
@@ -238,10 +238,10 @@ class _UserSummaryScreenState extends State<UserSummaryScreen>
           itemBuilder: (context, index) {
             final order = orders[index];
             Color statusColor = Colors.blue;
-            if (order.status == 'NEW') statusColor = Colors.blue;
-            if (order.status == 'PROCESS') statusColor = Colors.green;
-            if (order.status == 'APPROVED') statusColor = Colors.orange;
-            if (order.status == 'REFUSED') statusColor = Colors.purple;
+            if (order.status == 'NEW') statusColor = Colors.purple;
+            if (order.status == 'PROCESS') statusColor = Colors.orange;
+            if (order.status == 'APPROVED') statusColor = Colors.green;
+            if (order.status == 'REFUSED') statusColor = Colors.red;
 
             return Card(
               elevation: 0,

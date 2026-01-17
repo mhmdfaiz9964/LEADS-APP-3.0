@@ -79,7 +79,7 @@ class _NotesScreenState extends State<NotesScreen> {
                     children: [
                       const Icon(
                         Icons.person,
-                        color: Color(0xFF0046FF),
+                        color: AppTheme.primaryBlue,
                         size: 28,
                       ),
                       const SizedBox(width: 12),
@@ -98,7 +98,7 @@ class _NotesScreenState extends State<NotesScreen> {
                     children: [
                       const Icon(
                         Icons.edit_note,
-                        color: Color(0xFF0046FF),
+                        color: AppTheme.primaryBlue,
                         size: 28,
                       ),
                       const SizedBox(width: 12),

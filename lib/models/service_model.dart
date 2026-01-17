@@ -6,12 +6,14 @@ class ServiceModel {
   final String name;
   final int colorValue;
   final String? creatorEmail;
+  final int order;
 
   ServiceModel({
     required this.id,
     required this.name,
     required this.colorValue,
     this.creatorEmail,
+    this.order = 0,
   });
 
   Color get color => Color(colorValue);
@@ -21,6 +23,7 @@ class ServiceModel {
       'name': name,
       'colorValue': colorValue,
       'creatorEmail': creatorEmail,
+      'order': order,
     };
   }
 
@@ -31,6 +34,7 @@ class ServiceModel {
       name: data['name'] ?? '',
       colorValue: data['colorValue'] ?? 0xFF000000,
       creatorEmail: data['creatorEmail'],
+      order: data['order'] ?? 0,
     );
   }
 }

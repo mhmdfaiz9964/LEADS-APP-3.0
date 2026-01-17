@@ -160,7 +160,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0046FF),
+                        color: AppTheme.primaryBlue,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -181,7 +181,7 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
                             labelText: "Select Service",
                             prefixIcon: const Icon(
                               Icons.miscellaneous_services,
-                              color: Color(0xFF0046FF),
+                              color: AppTheme.primaryBlue,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -412,11 +412,11 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF0046FF)),
+        prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF0046FF), width: 2),
+          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
         ),
       ),
     );
