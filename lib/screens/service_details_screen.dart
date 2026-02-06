@@ -7,6 +7,8 @@ import 'package:leads_manager/theme/app_theme.dart';
 import 'package:leads_manager/screens/customer_details_screen.dart';
 import 'package:leads_manager/screens/add_customer_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import 'package:leads_manager/services/auth_service.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   final ServiceModel service;
@@ -43,6 +45,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final user = auth.currentUser;
+    final isAdmin = user?.role == 'Admin';
+    final filterEmail = isAdmin ? null : user?.email;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -63,6 +70,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             child: StreamBuilder<List<Customer>>(
               stream: DatabaseService().getCustomersByService(
                 widget.service.id,
+                filterEmail: filterEmail,
               ),
               builder: (context, snapshot) {
                 if (!snapshot.hasData)

@@ -110,7 +110,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           color: AppTheme.appBarBlue,
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: StreamBuilder<List<ServiceModel>>(
-            stream: DatabaseService().getServices(),
+            stream: DatabaseService().getServices(filterEmail: filterEmail),
             builder: (context, snapshot) {
               if (!snapshot.hasData) return const SizedBox();
               final services = snapshot.data!;

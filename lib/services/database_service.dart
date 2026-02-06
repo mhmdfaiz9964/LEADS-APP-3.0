@@ -199,9 +199,20 @@ class DatabaseService {
     });
   }
 
-  Stream<List<Customer>> getCustomersByService(String serviceId) {
-    return _db
-        .collection('booking_customers')
+  Stream<List<Customer>> getCustomersByService(
+    String serviceId, {
+    String? filterEmail,
+  }) {
+    Query query = _db.collection('booking_customers');
+    
+    // First apply user filter if exists to narrow scope
+    if (filterEmail != null) {
+      query = query.where('creatorEmail', isEqualTo: filterEmail);
+    }
+    
+    // Then apply service filter
+    // Note: This requires a composite index: creatorEmail ASC + serviceIds ASC
+    return query
         .where('serviceIds', arrayContains: serviceId)
         .snapshots()
         .map(
