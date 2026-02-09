@@ -5,6 +5,8 @@ import '../../theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import '../screens/admin/user_list_screen.dart';
 import '../screens/admin/add_user_screen.dart';
+import '../screens/admin/whatsapp_history_screen.dart';
+import '../screens/admin/send_whatsapp_bulk_screen.dart';
 
 class CustomSidebar extends StatelessWidget {
   final Function(int index, {String? statusFilter})? onIndexChanged;
@@ -273,6 +275,34 @@ class CustomSidebar extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const AddUserScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildSidebarItem(
+                    context,
+                    'WhatsApp History',
+                    Icons.history_rounded,
+                    () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const WhatsAppHistoryScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildSidebarItem(
+                    context,
+                    'Bulk WhatsApp',
+                    Icons.send_to_mobile_rounded,
+                    () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SendWhatsAppBulkScreen(),
                         ),
                       );
                     },
