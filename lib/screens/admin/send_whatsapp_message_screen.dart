@@ -82,6 +82,7 @@ class _SendWhatsAppMessageScreenState extends State<SendWhatsAppMessageScreen> {
       );
       setState(() => _isUploading = false);
       if (finalImageUrl == null) {
+        if (!mounted) return;
         setState(() => _isSending = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -141,10 +142,10 @@ class _SendWhatsAppMessageScreenState extends State<SendWhatsAppMessageScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withOpacity(0.05),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                 ),
               ),
               child: Row(
@@ -228,7 +229,7 @@ class _SendWhatsAppMessageScreenState extends State<SendWhatsAppMessageScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -253,7 +254,7 @@ class _SendWhatsAppMessageScreenState extends State<SendWhatsAppMessageScreen> {
                         fit: BoxFit.cover,
                         colorFilter: _isUploading
                             ? ColorFilter.mode(
-                                Colors.black.withOpacity(0.5),
+                                Colors.black.withValues(alpha: 0.5),
                                 BlendMode.darken,
                               )
                             : null,
@@ -340,7 +341,7 @@ class _SendWhatsAppMessageScreenState extends State<SendWhatsAppMessageScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryBlue.withOpacity(0.3),
+                        color: AppTheme.primaryBlue.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
