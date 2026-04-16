@@ -49,8 +49,17 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin);
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -59,16 +68,16 @@ class NotificationService {
       },
     );
 
-    // 2. Request FCM Permissions
-    NotificationSettings settings = await _messaging.requestPermission(
+    // 2. Request FCM Permissions (don't await to avoid blocking launch)
+    _messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      debugPrint('User granted permission');
-    }
+    ).then((settings) {
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        debugPrint('User granted permission');
+      }
+    });
 
     // 3. Set Background Handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -88,8 +97,8 @@ class NotificationService {
     // 5. Token Management
     _updateToken();
 
-    // 6. Initialize OneSignal
-    await _initOneSignal();
+    // 6. Initialize OneSignal (asynchronously)
+    _initOneSignal();
   }
 
   Future<void> handleLogin(User user) async {

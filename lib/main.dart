@@ -11,23 +11,71 @@ import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  bool isFirebaseInitialized = false;
+  String firebaseInitError = '';
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await NotificationService().init();
+    isFirebaseInitialized = true;
   } catch (e) {
+    firebaseInitError = e.toString();
     debugPrint("Init error: $e");
   }
 
-  runApp(const BookingApp());
+  // Not awaited to avoid blocking the UI thread
+  NotificationService().init();
+
+  runApp(BookingApp(
+    isFirebaseInitialized: isFirebaseInitialized,
+    firebaseInitError: firebaseInitError,
+  ));
 }
 
 class BookingApp extends StatelessWidget {
-  const BookingApp({super.key});
+  final bool isFirebaseInitialized;
+  final String firebaseInitError;
+
+  const BookingApp({
+    super.key,
+    this.isFirebaseInitialized = true,
+    this.firebaseInitError = '',
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (!isFirebaseInitialized) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.theme,
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "App Initialization Failed",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Please check your connection and try again.\n\nError Details:\n$firebaseInitError",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => AuthService())],
       child: MaterialApp(
